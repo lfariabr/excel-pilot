@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+
+// Express Setup
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,6 +8,14 @@ import userRouter from './routes/user';
 import "dotenv/config";
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from './utils/errorHandler';
+
+// GraphQL Setup
+import { typeDefs } from './schemas/typeDefs';
+import { resolvers } from './resolvers';
+
+// Apollo
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@as-integrations/express5';
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/conciApi";
 const PORT = Number(process.env.PORT) || 4000;
@@ -43,8 +53,22 @@ async function main() {
     try {
         await mongoose.connect(MONGO_URI);
         console.log('\n... ✅ Connected to MongoDB');
+
+        // Setup Apollo Server
+        const apollo = new ApolloServer({
+            typeDefs, 
+            resolvers,
+            introspection: true,
+            csrfPrevention: true,
+        });
+        await apollo.start();
+        app.use("/graphql", expressMiddleware(apollo, {
+            context: async ({ req, res }) => ({ req, res }) // add auth here later
+        }));
+
         app.listen(PORT, () => {
             console.log(`\n... 🚀 REST ready at http://localhost:${PORT}`);
+            console.log(`\n... 🚀 GraphQL ready at http://localhost:${PORT}/graphql`);
         });
     } catch (error) {
         console.log('\n... ❌ MongoDB connection error:', error);

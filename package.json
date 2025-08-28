@@ -16,14 +16,18 @@
     "@types/express": "^5.0.3",
     "@types/helmet": "^0.0.48",
     "@types/node": "^24.3.0",
+    "graphiql": "^5.2.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/express5": "^1.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "graphql": "^16.11.0",
     "helmet": "^8.1.0",
     "mongoose": "^8.18.0"
   }
