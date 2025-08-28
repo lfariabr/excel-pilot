@@ -13,18 +13,28 @@ const PORT = Number(process.env.PORT) || 4000;
 const app = express();
 
 app.use(cors()); // protection against cross-site requests
-app.use(helmet()); // Middleware for security headers
-app.use(express.json()); // Middleware for parsing JSON bodies
+app.use(helmet()); // sets safe HTTP headers (CSP/XSS/Frameguard/etc.)
+app.use(express.json()); // parses JSON so req.body works
 
 app.get("/health", (_req, res) => res.json({ // Health check endpoint
     ok: true
 }))
 
+app.get("/ready", (_req, res) => {
+    const up = mongoose.connection.readyState === 1;
+    res.status(up ? 200 : 503).json({
+        mongo: up,
+    })
+})
+
 app.use("/users", userRouter); // REST API for users
 
-app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
-    res.status(err.status || 500).json({ error: err.message || "Server error" });
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+    if (err?.code === 11000) {
+      return res.status(409).json({ error: "Duplicate key", details: err.keyValue });
+    }
+    const status = err instanceof AppError ? err.status : 500;
+    res.status(status).json({ error: err.message || "Server error" });
 });
 
 export default app;
