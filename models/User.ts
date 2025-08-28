@@ -34,7 +34,9 @@ const userSchema = new Schema<User>({
     email: { type: String, required: true },
     role: { type: String, required: true },
 
-});
+}
+, { timestamps: true } // adds createdAt and updatedAt fields automatically
+);
 
 const User = mongoose.model<User>('User', userSchema);
 export default User;
