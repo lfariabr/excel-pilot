@@ -1,10 +1,12 @@
 import { Router} from "express";
 import { Types } from "mongoose";
 import UserModel from "../models/User";
+import { AppError } from "../utils/errorHandler";
 
 const router = Router();
 
 // GET /users (list)
+// -----------------------------------------------------
 // curl http://localhost:4000/users
 router.get("/", async (_req, res, next) => {
     try {
@@ -15,31 +17,35 @@ router.get("/", async (_req, res, next) => {
     }
 });
 
-// Get../:id
+// GET../:id
+// -----------------------------------------------------
 // curl http://localhost:4000/users/<_id_here>
 router.get("/:id", async (req, res, next) => {
     try {
         const {id } = req.params;
-        if (!Types.ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid ID" });
+        if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");
         const user = await UserModel.findById(id).lean();
-        if (!user) return res.status(404).json({ error: "User not found" });
+        if (!user) throw new AppError(404, "User not found");
         res.json(user);
     } catch (error) {
         next(error);
     }
 })
 
-// Post
+// POST
+// -----------------------------------------------------
 // curl -X POST http://localhost:4000/users \
 //   -H "Content-Type: application/json" \
 //   -d '{"name":"Luis","email":"luis@example.com","role":"admin"}'
 router.post("/", async (req, res, next) => {
     try {
         const { name, email, role } = req.body;
-        if (!name || !email || !role) return res.status(400).json({ error: "Missing required fields" });
+        if (!name || !email || !role) throw new AppError(400, "Missing required fields");
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new AppError(400, 'Invalid email format');
+        if (!['user', 'admin'].includes(role)) throw new AppError(400, 'Invalid role');
         
         const exists = await UserModel.findOne({ email }).lean();
-        if (exists) return res.status(409).json({ error: "User already exists" });
+        if (exists) throw new AppError(409, "User already exists");
 
         const user = await UserModel.create({ name, email, role });
         res.status(201).json(user);
@@ -48,28 +54,30 @@ router.post("/", async (req, res, next) => {
     }
 })
 
-// Patch
+// PATCH
+// -----------------------------------------------------
 // curl -X PATCH http://localhost:4000/users/<_id_here> \
 //   -H "Content-Type: application/json" \
 //   -d '{"name":"Luis","email":"luis@example.com","role":"admin"}'
 router.patch("/:id", async (req, res, next) => {
     try {
         const { id } = req.params;
-        if (!Types.ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid id" });
+        if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");
         const doc = await UserModel.findByIdAndUpdate(id, { $set: req.body }, { new: true }).lean();
-        if (!doc) return res.status(404).json({ error: "Not found" });
+        if (!doc) throw new AppError(404, "Not found");
         res.json(doc);
     } catch (error) {
         next(error);
     }
 })
 
-// Delete
+// DELETE
+// -----------------------------------------------------
 // curl -X DELETE http://localhost:4000/users/<_id_here>
 router.delete("/:id", async (req, res, next) => {
     try {
         const { id } = req.params;
-        if (!Types.ObjectId.isValid(id)) return res.status(400).json({ error: "Invalid id" })
+        if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");
         const result = await UserModel.findByIdAndDelete(id);
         res.json({ ok: !!result });
     } catch (e) { next(e); }

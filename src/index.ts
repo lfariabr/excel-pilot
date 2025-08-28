@@ -4,6 +4,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import userRouter from './routes/user';
 import "dotenv/config";
+import { Request, Response, NextFunction } from 'express';
+import { AppError } from './utils/errorHandler';
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/conciApi";
 const PORT = Number(process.env.PORT) || 4000;
@@ -20,7 +22,7 @@ app.get("/health", (_req, res) => res.json({ // Health check endpoint
 
 app.use("/users", userRouter); // REST API for users
 
-app.use((err: any, _req: any, res: any, _next: any) => {
+app.use((err: AppError, _req: Request, res: Response, _next: NextFunction) => {
     console.error(err);
     res.status(err.status || 500).json({ error: err.message || "Server error" });
 });

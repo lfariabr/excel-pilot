@@ -4,7 +4,6 @@
     "module": "commonjs",
     "lib": ["es2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,6 +11,6 @@
     "resolveJsonModule": true,
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "models/**/*", "src/scripts/**/*"],
   "exclude": ["node_modules", "dist"]
 }
