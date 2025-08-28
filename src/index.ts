@@ -16,14 +16,25 @@ import { resolvers } from './resolvers';
 // Apollo
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@as-integrations/express5';
+import {
+  ApolloServerPluginLandingPageLocalDefault,
+  ApolloServerPluginLandingPageProductionDefault,
+} from '@apollo/server/plugin/landingPage/default';
 
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/conciApi";
 const PORT = Number(process.env.PORT) || 4000;
+const isDev = process.env.NODE_ENV !== 'production';
 
 const app = express();
 
 app.use(cors()); // protection against cross-site requests
-app.use(helmet()); // sets safe HTTP headers (CSP/XSS/Frameguard/etc.)
+app.use(helmet(
+    isDev
+    ? {
+        contentSecurityPolicy: false, // disable CSP for dev to allow GraphQL Playground
+      }
+    : undefined)
+); // sets safe HTTP headers (CSP/XSS/Frameguard/etc.)
 app.use(express.json()); // parses JSON so req.body works
 
 app.get("/health", (_req, res) => res.json({ // Health check endpoint
@@ -60,15 +71,21 @@ async function main() {
             resolvers,
             introspection: true,
             csrfPrevention: true,
+            plugins: [
+                isDev 
+                ? ApolloServerPluginLandingPageLocalDefault({ footer: false })
+                : ApolloServerPluginLandingPageProductionDefault({ footer: false }),
+        ],
         });
         await apollo.start();
-        app.use("/graphql", expressMiddleware(apollo, {
-            context: async ({ req, res }) => ({ req, res }) // add auth here later
+        app.use("/graphql",
+            expressMiddleware(apollo, {
+                context: async ({ req, res }) => ({ req, res }) // add auth here later
         }));
 
         app.listen(PORT, () => {
-            console.log(`\n... 🚀 REST ready at http://localhost:${PORT}`);
-            console.log(`\n... 🚀 GraphQL ready at http://localhost:${PORT}/graphql`);
+            console.log(`... 🚀 REST ready at http://localhost:${PORT}`);
+            console.log(`... 🪣  GraphQL ready at http://localhost:${PORT}/graphql`);
         });
     } catch (error) {
         console.log('\n... ❌ MongoDB connection error:', error);
