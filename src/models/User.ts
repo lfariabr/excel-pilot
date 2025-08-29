@@ -17,11 +17,11 @@ export interface User extends Document {
     name: string;
     email: string;
     role: "admin" | "casual" | "head" | "manager"; // admin, casual, head, manager
+    password: string;
+    comparePassword(candidate: string): Promise<boolean>;
     
     // TO BE IMPLEMENTED:
     // status: string; // active, inactive
-    password: string;
-    comparePassword(candidate: string): Promise<boolean>;
     // building: [];
 
 }
@@ -35,8 +35,8 @@ const userSchema = new Schema<User>({
 
     name: { type: String, required: true },
     email: { type: String, required: true },
-    role: { type: String, required: true, enum: ["admin", "casual", "head", "manager"] },
     password: { type: String, required: true, select: false }, // select: false = never auto-return
+    role: { type: String, required: true, enum: ["admin", "casual", "head", "manager"] },
 
 },
     { timestamps: true } // adds createdAt and updatedAt fields automatically
