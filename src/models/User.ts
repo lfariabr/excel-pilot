@@ -23,6 +23,7 @@ export interface User extends Document {
     // TO BE IMPLEMENTED:
     // status: string; // active, inactive
     // building: [];
+    // lastLogin: Date;
 
 }
 
@@ -34,7 +35,7 @@ const userSchema = new Schema<User>({
     // required: true ensures the field must exist when saving to MongoDB
 
     name: { type: String, required: true },
-    email: { type: String, required: true },
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     password: { type: String, required: true, select: false }, // select: false = never auto-return
     role: { type: String, required: true, enum: ["admin", "casual", "head", "manager"] },
 

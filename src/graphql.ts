@@ -8,6 +8,7 @@ import { expressMiddleware } from "@as-integrations/express5";
 // GraphQL
 import { typeDefs } from "./schemas/typeDefs";
 import { resolvers } from "./resolvers";
+import { verifyAccessToken } from "./utils/jwt";
 
 // Apollo Server
 import { ApolloServer } from "@apollo/server";
@@ -58,9 +59,19 @@ export async function attachGraphQL(
     expressMiddleware(apollo, {
       context: async ({ req, res }) => {
         // Put per-request stuff here: user, redis, dataloaders
-        // const user = await verifyJWT(req.headers.authorization);
+
+        const auth = req.headers.authorization || "";
+        const token = auth.startsWith("Bearer ") ? auth.slice(7) : undefined;
+        const decoded = verifyAccessToken(token);
+        // ctx.user will be null or { sub: string; role: string; email: string }
+
         // const loaders = makeLoaders();
-        return { req, res /*, user, loaders, redis */ };
+        return { 
+          req, 
+          res, 
+          user: decoded,
+          /*, user, loaders, redis */ 
+        };
       },
     })
   );
