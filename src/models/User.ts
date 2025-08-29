@@ -3,6 +3,8 @@ import mongoose, { Document, Schema } from 'mongoose';
 // • Document → a Mongoose type that represents a MongoDB document (adds default fields like _id, createdAt, etc.).
 // • Schema → lets us define the structure (shape) of documents in a collection.
 
+import bcrypt from "bcrypt";
+
 export interface User extends Document {
     // • TypeScript interface.
 	// • By extending Document, it inherits all MongoDB document properties (like _id).
@@ -18,7 +20,8 @@ export interface User extends Document {
     
     // TO BE IMPLEMENTED:
     // status: string; // active, inactive
-    // password: string;
+    password: string;
+    comparePassword(candidate: string): Promise<boolean>;
     // building: [];
 
 }
@@ -32,11 +35,23 @@ const userSchema = new Schema<User>({
 
     name: { type: String, required: true },
     email: { type: String, required: true },
-    role: { type: String, required: true, enum: ["admin", "casual", "head", "manager"] }
+    role: { type: String, required: true, enum: ["admin", "casual", "head", "manager"] },
+    password: { type: String, required: true, select: false }, // select: false = never auto-return
 
-}
-, { timestamps: true } // adds createdAt and updatedAt fields automatically
+},
+    { timestamps: true } // adds createdAt and updatedAt fields automatically
 );
+
+userSchema.pre("save", async function (next){
+    if (!this.isModified("password")) return next();
+    const saltRounds = 10;
+    this.password = await bcrypt.hash(this.password, saltRounds);
+    next();
+});
+
+userSchema.methods.comparePassword = function (candidate: string) {
+    return bcrypt.compare(candidate, this.password);
+};
 
 const UserModel = mongoose.model<User>('User', userSchema);
 export default UserModel;
