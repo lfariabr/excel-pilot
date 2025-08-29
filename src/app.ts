@@ -1,3 +1,4 @@
+// app.ts — pure Express app (no listening)
 
 import express from "express";
 import cors from "cors";
@@ -8,14 +9,13 @@ import { Request, Response, NextFunction } from "express";
 import { AppError } from "./utils/errorHandler";
 import mongoose from "mongoose";
 
-// app.ts — pure Express app (no listening)
 export function createApp() {
     const app = express();
   
     const isDev = process.env.NODE_ENV !== "production";
   
     // Global middlewares
-    app.use(cors(/* your options */));
+    app.use(cors(/* add options */));
     app.use(
       helmet(isDev ? { contentSecurityPolicy: false } : undefined)
     );

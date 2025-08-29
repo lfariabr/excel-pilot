@@ -19,7 +19,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.2** - Layer #1 (Database + Models): Added MongoDB connection and User model
 - **v0.0.3** - Layer #2 (Express API): Set up Express Server with basic User routes (CRUD) + error handler
 - **v0.0.4** - Layer #3 (GraphQL API): Set up Apollo Server with basic User queries and mutations
+- **v0.0.5** - Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts`
 
 ## **Next** (TODO):
-- **v0.0.5** - Login, Register and Authentication
-
+- **v0.0.6** - Login, Register and Authentication

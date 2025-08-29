@@ -1,9 +1,13 @@
+// server.ts — the only file that starts listening
 import mongoose from "mongoose";
 import http from "http";
+
+// Express
 import { createApp } from "./app";
+
+// GraphQL / Apollo Server
 import { attachGraphQL } from "./graphql";
 
-// server.ts — the only file that starts listening
 async function start() {
     await mongoose.connect(process.env.MONGO_URI!);
     console.log('\n... ✅ Connected to MongoDB')
@@ -16,7 +20,7 @@ async function start() {
     const PORT = Number(process.env.PORT) || 4000;
     httpServer.listen(PORT, () => {
       console.log(`... 🚀 REST ready at http://localhost:${PORT}`);
-      console.log(`... 🪣 GraphQL ready at http://localhost:${PORT}/graphql`);
+      console.log(`... ⚙️ GraphQL ready at http://localhost:${PORT}/graphql`);
     });
   
     // Graceful shutdown
