@@ -42,7 +42,7 @@ export const authResolvers = {
             const parsed = LoginSchema.parse(args.input);
             const { email, password } = parsed;
 
-            const user = await UserModel.findOne({ email });
+            const user = await UserModel.findOne({ email }).select('+password');
             if (!user) {
                 throw new GraphQLError("Invalid email or password", {
                     extensions: {
