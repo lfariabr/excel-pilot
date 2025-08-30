@@ -1,4 +1,5 @@
 import UserModel from "../../models/User";
+import { requireAuth, requireRole } from "../../utils/guards";
 
 export const usersMutation = {
 
@@ -53,11 +54,10 @@ export const usersMutation = {
     },
     
     // delete user
-    deleteUser: async (_: any, { 
-        id }: { 
-            id: string 
-        }) => {
+    deleteUser: async (_: any, { id }: { id: string }, ctx: any) => {
         try {
+            console.log('Checking auth...')
+            requireRole(ctx, ["admin"]);
             console.log('🔍 GraphQL deleteUser called with id:', id);
             const user = await UserModel.findByIdAndDelete(id);
             console.log('✅ User deleted:', user?._id);

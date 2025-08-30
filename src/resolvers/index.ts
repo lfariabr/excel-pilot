@@ -1,5 +1,6 @@
 import { usersQuery } from "./users/queries";
 import { usersMutation } from "./users/mutations";
+import { authResolvers } from "./auth/auth";
 
 export const resolvers = {
     User: {
@@ -7,8 +8,10 @@ export const resolvers = {
     },
     Query: {
         ...usersQuery,
+        ...authResolvers.Query,
     },
     Mutation: {
         ...usersMutation,
+        ...authResolvers.Mutation,
     },
 };

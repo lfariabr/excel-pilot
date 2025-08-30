@@ -2,13 +2,14 @@ import { Router} from "express";
 import { Types } from "mongoose";
 import UserModel from "../models/User";
 import { AppError } from "../utils/errorHandler";
+import { requireAuth } from "../utils/guards";
 
 const router = Router();
 
 // GET /users (list)
 // -----------------------------------------------------
 // curl http://localhost:4000/users
-router.get("/", async (_req, res, next) => {
+router.get("/", requireAuth, async (_req, res, next) => {
     try {
         const users = await UserModel.find().lean();
         res.json(users);

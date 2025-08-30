@@ -1,14 +1,16 @@
 import UserModel from "../../models/User";
+import { requireAuth } from "../../utils/guards";
 
 export const usersQuery = {
     // get all users
-    users: async () => {
+    users: async (_: any, __: any, ctx: any) => {
+        requireAuth(ctx);
+        try {
 
         // testing
         // curl -X POST http://localhost:4000/graphql \
         //   -H "Content-Type: application/json" \
         //   -d '{"query":"{ users { id name email role } }"}'
-        try {
             console.log('🔍 GraphQL users query called');
             const users = await UserModel.find().lean();
             console.log('📊 Found users:', users?.length || 0);

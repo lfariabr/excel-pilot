@@ -1,4 +1,4 @@
-# conciergeApi
+# ExcelPilot
 
 Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, Express.js, Apollo Server and MongoDB.
 
