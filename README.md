@@ -22,4 +22,4 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.5** - Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts`
 
 ## **Next** (TODO):
-- **v0.0.6** - Login, Register and Authentication
+- **v0.0.6** - Login, Register + Authentication (JWT, password hashing, requireAuth, requireRole)
