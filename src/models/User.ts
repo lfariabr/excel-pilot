@@ -9,7 +9,7 @@ export interface User extends Document {
     // • TypeScript interface.
 	// • By extending Document, it inherits all MongoDB document properties (like _id).
 	// • Explicitly tell TypeScript: “Every user in my app must have name, email, and role as strings.”
-	// • Gives type-checking at compile time (the beauty of catching mistakes before tge code even runs).
+	// • Gives type-checking at compile time (the beauty of catching mistakes before the code even runs).
     // Example:
         // const u: User = { name: "Luis", email: "x@y.com" }; 
         // ❌ Error: role is missing
