@@ -21,7 +21,7 @@ router.get("/", requireAuth, async (_req, res, next) => {
 // GET../:id
 // -----------------------------------------------------
 // curl http://localhost:4000/users/<_id_here>
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", requireAuth, async (req, res, next) => {
     try {
         const {id } = req.params;
         if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");
@@ -60,7 +60,7 @@ router.post("/", async (req, res, next) => {
 // curl -X PATCH http://localhost:4000/users/<_id_here> \
 //   -H "Content-Type: application/json" \
 //   -d '{"name":"Luis","email":"luis@example.com","role":"admin"}'
-router.patch("/:id", async (req, res, next) => {
+router.patch("/:id", requireAuth,async (req, res, next) => {
     try {
         const { id } = req.params;
         if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");
@@ -75,7 +75,7 @@ router.patch("/:id", async (req, res, next) => {
 // DELETE
 // -----------------------------------------------------
 // curl -X DELETE http://localhost:4000/users/<_id_here>
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", requireAuth, async (req, res, next) => {
     try {
         const { id } = req.params;
         if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");

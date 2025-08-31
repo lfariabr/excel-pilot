@@ -37,8 +37,9 @@ export const usersMutation = {
             name?: string, 
             email?: string, 
             role?: string 
-        }) => {
+        }, ctx: any) => {
         try {
+            requireAuth(ctx);
             console.log('🔍 GraphQL updateUser called with:', { id, name, email, role });
             const user = await UserModel.findByIdAndUpdate(
                 id, 
