@@ -18,5 +18,5 @@ const ConversationSchema = new Schema<IConversation>({
     { timestamps: true }
 );
 
-const ConversationModel = model<IConversation>("Conversation", ConversationSchema);
-export default ConversationModel;
+const Conversation = model<IConversation>("Conversation", ConversationSchema);
+export default Conversation;

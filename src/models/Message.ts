@@ -37,5 +37,5 @@ const ChatMessageSchema = new Schema<IChatMessage>({
 
 ChatMessageSchema.index({ conversationId: 1, createdAt: 1 });
 
-const MessageModel = model<IChatMessage>("Message", ChatMessageSchema);
-export default MessageModel;
+const Message = model<IChatMessage>("Message", ChatMessageSchema);
+export default Message;
