@@ -19,7 +19,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 ## **Detailed Changelog** 
 
 ### **DONE**:
-- **v0.0.1** - Initial commit with TypeScript Node.js project
+- **v0.0.1** - Starting TypeScript Node.js project
 - **v0.0.2** - Layer #1 (Database + Models): Added MongoDB connection and User model
 - **v0.0.3** - Layer #2 (Express API): Set up Express Server with basic User routes (CRUD) + error handler
 - **v0.0.4** - Layer #3 (GraphQL API): Set up Apollo Server with basic User queries and mutations
@@ -33,8 +33,13 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Create GraphQL types to expose endpoints
     - [X] Create resolvers (queries) integrated with ctx
     - [X] Create resolvers (mutations) integrated with ctx
-    - [ ] Run tests on Apollo Server
-    - [ ] Plan on rate limiting
+    - [X] Run tests on Apollo Server
+    - [ ] Persist messages on askOpenAI
+    - [ ] Paginate messages on Query
+    - [ ] Normalize timestamps on resolvers
+    - [ ] Plan on rate limiting on askOpenAI
+    - [ ] Add "title" field on askOpenAI from the first assistance reply
+    - [ ] Conversation list should be sorted by lastMessageAt descending
 - **tbd** - Redis + Caching
 - **tbd** - Docker
 - **tbd** - Winston + Logging
