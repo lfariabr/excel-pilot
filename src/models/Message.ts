@@ -1,5 +1,5 @@
 import { Schema, model, Types, Document } from "mongoose";
-
+// Info: a single turn inside thread (user or assistant!)
 export interface IChatMessage extends Document {
     conversationId: Types.ObjectId;
     userId: Types.ObjectId;
@@ -25,7 +25,11 @@ const ChatMessageSchema = new Schema<IChatMessage>({
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     role: { type: String, enum: ['user', 'assistant', 'system'], required: true },
     content: { type: String, required: true },
-    aiModel: { type: String, required: true },
+    aiModel: { 
+        type: String, 
+        required: function (this: any) {
+            return this.role === "assistant";
+        } },
     usage: {
         input_tokens: { type: Number },
         output_tokens: { type: Number },

@@ -7,9 +7,9 @@ export const conversationTypes = `#graphql
         lastMessageAt: String!
     },
     type Usage {
-        input_tokens: Int!
-        output_tokens: Int!
-        total_tokens: Int!
+        input_tokens: Int
+        output_tokens: Int
+        total_tokens: Int
     }
     type Message {
         id: ID!
@@ -17,7 +17,7 @@ export const conversationTypes = `#graphql
         userId: ID!
         role: String!
         content: String!
-        aiModel: String!
+        aiModel: String
         usage: Usage
         createdAt: String!
     }

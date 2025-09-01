@@ -1,5 +1,5 @@
 import { Schema, model, Types, Document } from "mongoose";
-
+// Info: Conversation is the container/thread - one chat per session
 export interface IConversation extends Document {
     userId: Types.ObjectId;
     title?: string;
@@ -7,6 +7,11 @@ export interface IConversation extends Document {
     lastMessageAt: Date;
     createdAt: Date;
     updatedAt: Date;
+    // Extra options
+    // summary?: string;
+    // settings?: { model, temperature }
+    // archived?: boolean
+    // deletedAt?: Date
 }
 
 const ConversationSchema = new Schema<IConversation>({

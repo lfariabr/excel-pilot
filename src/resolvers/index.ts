@@ -3,6 +3,7 @@ import { usersMutation } from "./users/mutations";
 import { authQueries } from "./auth/queries";
 import { authMutations } from "./auth/mutations";
 import { conversationsQuery } from "./conversations/queries";
+import { conversationsMutation } from "./conversations/mutations";
 
 export const resolvers = {
     User: {
@@ -16,5 +17,6 @@ export const resolvers = {
     Mutation: {
         ...usersMutation,
         ...authMutations,
+        ...conversationsMutation,
     },
 };

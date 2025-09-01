@@ -31,8 +31,8 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Create openAI service
     - [X] Create model for Conversation and Message
     - [X] Create GraphQL types to expose endpoints
-    - [ ] Create resolvers (queries) integrated with ctx
-    - [ ] Create resolvers (mutations) integrated with ctx
+    - [X] Create resolvers (queries) integrated with ctx
+    - [X] Create resolvers (mutations) integrated with ctx
     - [ ] Run tests on Apollo Server
     - [ ] Plan on rate limiting
 - **tbd** - Redis + Caching
