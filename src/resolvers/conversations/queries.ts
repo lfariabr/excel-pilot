@@ -1,36 +1,57 @@
 import { GraphQLError } from "graphql";
 import { requireAuth } from "../../utils/guards";
+import { formatTimestamp } from "../../utils/dateFormatter";
 import Conversation from "../../models/Conversation";
 import Message from "../../models/Message";
 
 export const conversationsQuery = {
     // get all conversations
-    // Conversations are the containers/threads - one chat per session
+    // I have defined CONVERSATIONS as the containers/threads - one chat per session
     conversations: async (_: any, __: any, ctx: any) => {
         requireAuth(ctx);
         if (!ctx.user) {
             throw new GraphQLError("UNAUTHENTICATED");
         }
-        console.log('🔍 GraphQL conversations query called');
         const conversations = await Conversation.find({ userId: ctx.user.sub }).sort({ updatedAt: -1 });
-        console.log('📊 Found conversations:', conversations?.length || 0);
-        return conversations;
+        
+        // Format timestamps in the query result
+        const conversations_result = conversations.map(conversation => {
+            const convObj = conversation.toObject() as any;
+            return {
+                ...convObj,
+                id: convObj._id.toString(),
+                createdAt: formatTimestamp(convObj.createdAt),
+                updatedAt: formatTimestamp(convObj.updatedAt),
+                lastMessageAt: formatTimestamp(convObj.lastMessageAt)
+            };
+        });
+
+        return conversations_result;
     },
     // get messages
-    // Messages are the turns inside a conversation
+    // I have defined MESSAGES as the turns inside a conversation
     messages: async (_:any, {conversationId } : { conversationId: string }, ctx: any) => {
         requireAuth(ctx);
         if (!ctx.user) {
             throw new GraphQLError("UNAUTHENTICATED");
         }
-        console.log('🔍 GraphQL messages query called');
         const conversation = await Conversation.findById(conversationId);
         if (!conversation || String(conversation.userId) !== ctx.user.sub) {
             throw new GraphQLError("FORBIDDEN");
         }
         const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
-        console.log('📊 Found messages:', messages?.length || 0);
-        return messages;
+        
+        // Format timestamps in the query result
+        const messages_result = messages.map(message => {
+            const messageObj = message.toObject() as any;
+            return {
+                ...messageObj,
+                id: messageObj._id.toString(),
+                createdAt: formatTimestamp(messageObj.createdAt)
+            };
+        });
+
+        return messages_result;
     },
 }
         
