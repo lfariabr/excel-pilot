@@ -1,9 +1,9 @@
 /**
- * Utility functions for date formatting in GraphQL responses
+ * Utility functions for date formatting in the GraphQL responses
  */
 
 /**
- * Converts MongoDB timestamp (number or Date) to ISO string
+ * They convert MongoDB timestamp (number or Date) to ISO string
  * @param timestamp - MongoDB timestamp (can be number or Date object)
  * @returns ISO string format (e.g., "2025-09-03T06:31:17.000Z")
  */
@@ -24,7 +24,7 @@ export const formatTimestamp = (timestamp: number | Date | string): string => {
 };
 
 /**
- * Converts MongoDB timestamp to human-readable format
+ * They convert MongoDB timestamp to human-readable format
  * @param timestamp - MongoDB timestamp
  * @returns Human readable format (e.g., "Sep 3, 2025, 6:31 AM")
  */
