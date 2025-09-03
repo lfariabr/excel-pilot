@@ -34,9 +34,9 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Create resolvers (queries) integrated with ctx
     - [X] Create resolvers (mutations) integrated with ctx
     - [X] Run tests on Apollo Server
+    - [X] Create dateFormatter for timestamps on queries
     - [ ] Persist messages on askOpenAI
     - [ ] Paginate messages on Query
-    - [ ] Normalize timestamps on resolvers
     - [ ] Plan on rate limiting on askOpenAI
     - [ ] Add "title" field on askOpenAI from the first assistance reply
     - [ ] Conversation list should be sorted by lastMessageAt descending
