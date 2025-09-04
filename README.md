@@ -26,7 +26,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.5** - Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts`
 - **v0.0.6** - Login, Register + Authentication (JWT, password hashing, requireAuth, requireRole)
 
-### **Next** (TODO):
+### **WORK IN PROGRESS**:
 - **v0.0.7** - OpenAI client (Agent, ChatMessage)
     - [X] Create openAI service
     - [X] Create model for Conversation and Message
@@ -41,7 +41,12 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [ ] Paginate messages on Query
     - [ ] Plan on rate limiting on askOpenAI
     - [ ] Add "title" field on askOpenAI from the first assistance reply
-- **tbd** - Redis + Caching
+- **v0.0.8** - Redis
+    - [X] install dependencies: npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-peer-deps
+    - [ ] 
+
+### **BACKLOG**:
+- **tbd** - Caching
 - **tbd** - Docker
 - **tbd** - Winston + Logging
 
