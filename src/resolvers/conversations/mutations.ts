@@ -3,6 +3,7 @@ import { requireAuth } from "../../utils/guards";
 import Conversation from "../../models/Conversation";
 import Message from "../../models/Message";
 import { askOpenAI } from "../../services/openAi";
+import { formatTimestamp } from "../../utils/dateFormatter";
 
 export const conversationsMutation = {
     startConversation: async (_: any, { title }: { title: string }, ctx: any) => {
@@ -16,8 +17,16 @@ export const conversationsMutation = {
             systemPrompt: "You are Excel's BM Concierge Personal Assistant.",
             lastMessageAt: new Date(),
         });
+        // Format timestamps in the mutation result
+        const convObj = conversation.toObject() as any;
         await conversation.save();
-        return conversation;
+        return {
+            ...convObj,
+            id: convObj._id.toString(),
+            createdAt: formatTimestamp(convObj.createdAt),
+            updatedAt: formatTimestamp(convObj.updatedAt),
+            lastMessageAt: formatTimestamp(convObj.lastMessageAt)
+        };
     },
     sendMessage: async (_: any, { conversationId, content }: { conversationId: string, content: string }, ctx: any) => {
         requireAuth(ctx);
