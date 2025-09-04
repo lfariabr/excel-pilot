@@ -42,8 +42,13 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [ ] Plan on rate limiting on askOpenAI
     - [ ] Add "title" field on askOpenAI from the first assistance reply
 - **v0.0.8** - Redis
+> Goal: Implement rate limiting on sendMessage mutation that calls OpenAI.
     - [X] install dependencies: npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-peer-deps
-    - [ ] 
+    - [X] Create `redis.ts` file and test connection
+    - [X] Implement rate limiting middleware (`UserRateLimiter`)
+    - [X] Create `test-rate-limiter.ts` file to validate usage
+    - [ ] add rate limiting check to send Message mutation
+    - [ ] estimate token usage before calling OpenAI
 
 ### **BACKLOG**:
 - **tbd** - Caching

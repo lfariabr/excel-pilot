@@ -1,5 +1,7 @@
 import redisClient from "./redis";
 
+// npx ts-node src/test-redis.ts
+
 async function testRedis() {
     try {
         console.log("Testing Redis connection...");
