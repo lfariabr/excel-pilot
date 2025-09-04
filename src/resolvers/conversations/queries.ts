@@ -39,7 +39,7 @@ export const conversationsQuery = {
         if (!conversation || String(conversation.userId) !== ctx.user.sub) {
             throw new GraphQLError("FORBIDDEN");
         }
-        const messages = await Message.find({ conversationId }).sort({ createdAt: 1 });
+        const messages = await Message.find({ conversationId }).sort({ createdAt: -1 });
         
         // Format timestamps in the query result
         const messages_result = messages.map(message => {
