@@ -25,9 +25,12 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.4** - Layer #3 (GraphQL API): Set up Apollo Server with basic User queries and mutations
 - **v0.0.5** - Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts`
 - **v0.0.6** - Login, Register + Authentication (JWT, password hashing, requireAuth, requireRole)
+- **v0.0.7** - OpenAI client (Agent, ChatMessage)
+- **v0.0.8** - Redis (Rate Limiting)
 
 ### **WORK IN PROGRESS**:
 - **v0.0.7** - OpenAI client (Agent, ChatMessage)
+> Goal: Implement OpenAI client to handle conversations and messages.
     - [X] Create openAI service
     - [X] Create model for Conversation and Message
     - [X] Create GraphQL types to expose endpoints
@@ -41,14 +44,16 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [ ] Paginate messages on Query
     - [ ] Plan on rate limiting on askOpenAI
     - [ ] Add "title" field on askOpenAI from the first assistance reply
+
 - **v0.0.8** - Redis
 > Goal: Implement rate limiting on sendMessage mutation that calls OpenAI.
-
     - [X] install dependencies: npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-peer-deps
     - [X] Create `redis.ts` file and test connection
+    - [X] Create `test-redis.ts` file to validate connection
     - [X] Implement rate limiting middleware (`UserRateLimiter`)
     - [X] Create `test-rate-limiter.ts` file to validate usage
-    - [ ] add rate limiting check to send Message mutation
+    - [X] add rate limiting check to send Message mutation
+    - [X] Create `test-graphql-rate-limit.ts` file to validate usage
     - [ ] estimate token usage before calling OpenAI
 
 ### **BACKLOG**:

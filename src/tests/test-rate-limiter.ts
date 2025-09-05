@@ -1,6 +1,6 @@
-import { userRateLimiter } from './middleware/rateLimiter';
+import { userRateLimiter } from '../middleware/rateLimiter';
 
-// npx ts-node src/test-rate-limiter.ts
+// npx ts-node src/tests/test-rate-limiter.ts
 
 async function testRateLimiter() {
     const userId = 'test-user-123';

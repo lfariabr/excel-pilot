@@ -4,6 +4,7 @@ import Conversation from "../../models/Conversation";
 import Message from "../../models/Message";
 import { askOpenAI } from "../../services/openAi";
 import { formatTimestamp } from "../../utils/dateFormatter";
+import { userRateLimiter, rateLimitConfig } from "../../middleware/rateLimiter";
 
 export const conversationsMutation = {
     startConversation: async (_: any, { title }: { title: string }, ctx: any) => {
@@ -29,11 +30,27 @@ export const conversationsMutation = {
         };
     },
     sendMessage: async (_: any, { conversationId, content }: { conversationId: string, content: string }, ctx: any) => {
+        // v0.0.6 - Authentication
         requireAuth(ctx);
         if (!ctx.user) {
             throw new GraphQLError("UNAUTHENTICATED");
         }
-        console.log("conversationId", conversationId);
+
+        // v0.0.8 - Rate Limiting
+        const rateLimitResult = await userRateLimiter.checkUserLimit(ctx.user.sub, 'openai');
+        if (!rateLimitResult.allowed) {
+            throw new GraphQLError(
+                `Rate limit exceeded. You can make ${rateLimitConfig.openai.max} OpenAI requests per minute. Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
+            {
+                extensions: {
+                    code: "RATE_LIMIT_EXCEEDED",
+                    remaining: rateLimitResult.remaining,
+                    resetTime: rateLimitResult.resetTime,
+                }
+            }
+        );
+        }
+
         const conversation = await Conversation.findById(conversationId);
         if (!conversation || String(conversation.userId) !== ctx.user.sub) {
             throw new GraphQLError("FORBIDDEN");
@@ -54,6 +71,7 @@ export const conversationsMutation = {
             content: m.content,
         }));
 
+        // v0.0.7 - openAI
         // call openAI
         const talkToOpenAI = await askOpenAI({
             history,

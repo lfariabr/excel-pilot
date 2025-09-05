@@ -31,6 +31,7 @@ export class UserRateLimiter {
             // check if limit is exceeded
             if (count >= config.max) {
                 const ttl = await redisClient.ttl(key);
+                // TTL tells us how many seconds are left, when the window resets
                 return {
                     allowed: false,
                     remaining: 0,
@@ -38,7 +39,8 @@ export class UserRateLimiter {
                 };
             }
 
-            //  Increment counter
+            //  Increment counter (creates if doesn't exist)
+            // INCR is atomic - no race conditions!!!
             const newCount = await redisClient.incr(key);
             
             // set expiration on the first request

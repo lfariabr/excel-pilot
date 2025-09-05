@@ -1,6 +1,6 @@
-import redisClient from "./redis";
+import redisClient from "../redis";
 
-// npx ts-node src/test-redis.ts
+// npx ts-node src/tests/test-redis.ts
 
 async function testRedis() {
     try {
