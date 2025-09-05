@@ -14,12 +14,19 @@ const redisConfig = {
 
 export const redisClient = new Redis(redisConfig);
 
-redisClient.on("connect", () => {
-    console.log("\n... ✅ Redis client connected")
-})
+export async function connectRedis() {
+  try {
+    await redisClient.connect();
+    console.log('... 📖 Redis connected');
+  }
+  catch (err) {
+    console.error('❌ Redis connection error:', err);
+    process.exit(1);
+  }
+}
 
 redisClient.on("ready", () => {
-    console.log("... ✅ Redis client ready")
+    // console.log("... ✅ Redis client ready")
 })
 
 redisClient.on('error', (err) => {

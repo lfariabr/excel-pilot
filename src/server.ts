@@ -8,9 +8,14 @@ import { createApp } from "./app";
 // GraphQL / Apollo Server
 import { attachGraphQL } from "./graphql";
 
+// Redis
+import { redisClient, connectRedis } from "./redis";
+
 async function start() {
     await mongoose.connect(process.env.MONGO_URI!);
     console.log('\n... ✅ Connected to MongoDB')
+
+    await connectRedis();
   
     const app = createApp();
     const httpServer = http.createServer(app);
@@ -24,8 +29,21 @@ async function start() {
     });
   
     // Graceful shutdown
-    process.on("SIGINT", () => httpServer.close(() => process.exit(0)));
-    process.on("SIGTERM", () => httpServer.close(() => process.exit(0)));
+    process.on("SIGINT", () => {
+      httpServer.close(() => {
+        mongoose.connection.close();
+        redisClient.disconnect();
+        process.exit(0);
+      });
+    });
+
+    process.on("SIGTERM", () => {
+      httpServer.close(() => {
+        mongoose.connection.close();
+        redisClient.disconnect();
+        process.exit(0);
+      });
+    });
   }
   
   start().catch((e) => {
