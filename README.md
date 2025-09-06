@@ -1,6 +1,6 @@
 # ExcelPilot
 
-Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, Express.js, Apollo Server and MongoDB.
+Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, Express.js, Apollo Server, MongoDB, Redis and OpenAI.
 
 ## Tech Stack & Version Control:
 | Tech | Status | Version |
@@ -12,9 +12,10 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | Apollo Server v1 | ✅ | _v0.0.4_ |
 | Apollo Server v2 | ✅ | _v0.0.5_ |
 | JWT + Auth | ✅ | _v0.0.6_ |
-| OpenAI | 🏗️🧱🔨 | TBD |
-| Redis | 🏗️🧱🔨 | TBD |
+| OpenAI | ✅ | _v0.0.7_ |
+| Redis | ✅ | _v0.0.8_ |
 | Docker | 🏗️🧱🔨 | TBD |
+| Winston | 🏗️🧱🔨 | TBD |
 
 ## **Detailed Changelog** 
 
@@ -26,22 +27,13 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.5** - Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts`
 - **v0.0.6** - Login, Register + Authentication (JWT, password hashing, requireAuth, requireRole)
 - **v0.0.7** - OpenAI client (Agent, ChatMessage)
+- **v0.0.8** - Redis (Rate Limiting, Token Budget - daily and monthly per user)
 
 ### **WORK IN PROGRESS**:
-
-- **v0.0.8** - Redis
-> Goal: Implement rate limiting on sendMessage mutation that calls OpenAI.
-- [X] install dependencies: npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-peer-deps
-- [X] Create `redis.ts` file and test connection
-- [X] Create `test-redis.ts` file to validate connection
-- [X] Implement rate limiting middleware (`UserRateLimiter`)
-- [X] Create `test-rate-limiter.ts` file to validate usage
-- [X] add rate limiting check to send Message mutation
-- [X] Create `test-graphql-rate-limit.ts` file to validate usage
-- [ ] estimate token usage before calling OpenAI
+- tbd
 
 ### **BACKLOG**:
 - **tbd** - Caching
 - **tbd** - Docker
-- **tbd** - Winston + Logging
+- **tbd** - Winston
 
