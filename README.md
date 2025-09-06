@@ -26,28 +26,8 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.5** - Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts`
 - **v0.0.6** - Login, Register + Authentication (JWT, password hashing, requireAuth, requireRole)
 - **v0.0.7** - OpenAI client (Agent, ChatMessage)
-- **v0.0.8** - Redis (Rate Limiting)
 
 ### **WORK IN PROGRESS**:
-- **v0.0.7** - OpenAI client (Agent, ChatMessage)
-> Goal: Implement OpenAI client to handle conversations and messages.
-- [X] Create openAI service
-- [X] Create model for Conversation and Message
-- [X] Create GraphQL types to expose endpoints
-- [X] Create resolvers (queries) integrated with ctx
-- [X] Create resolvers (mutations) integrated with ctx
-- [X] Run tests on Apollo Server
-- [X] Create dateFormatter for timestamps on queries
-- [X] Conversation list should be sorted by lastMessageAt descending
-- [X] Messages should be sorted by createdAt descending
-- [X] Plan on rate limiting on askOpenAI
-- [X] Recharge openAI credits (plus 10 USD)
-- [X] Plan on .json tune up based on Opera House for testing
-- [X] Run tests on OpenAI service and map results
-- [X] Send different messages on same conversation to check if responses follow the same conversation
-- [X] Search different conversation and see different responses
-- [X] Persist messages on askOpenAI
-- [ ] Paginate messages on Query
 
 - **v0.0.8** - Redis
 > Goal: Implement rate limiting on sendMessage mutation that calls OpenAI.
