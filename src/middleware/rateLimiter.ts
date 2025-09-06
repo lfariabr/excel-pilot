@@ -63,6 +63,74 @@ export class UserRateLimiter {
             };
         }
     }
+
+    /**
+     * This will be responsible to check and update token budget for an user
+     * @param userId - user ID from JWT token
+     * @param tokensToUse - estimated or actual tokens to consume
+     */
+    async checkUserTokenBudget(userId: string, tokensToUse: number): Promise<RateLimitResult> {
+        const dailyKey = `token_budget:daily:${userId}`;
+        const monthlyKey = `token_budget:monthly:${userId}`;
+
+        // budget limits
+        const dailyLimit = 50000; // 50k tokens per day (~$1.00)
+        const monthlyLimit = 1000000; // 1M tokens per month (~$20.00)
+
+        try {
+            // get current usage
+            const [dailyUsed, monthlyUsed] = await Promise.all([
+                redisClient.get(dailyKey).then(val => parseInt(val || '0')),
+                redisClient.get(monthlyKey).then(val => parseInt(val || '0')),
+            ]);
+
+            // check if adding tokens will exceed limits
+            if (dailyUsed + tokensToUse > dailyLimit) {
+                const ttl = await redisClient.ttl(dailyKey);
+                return {
+                    allowed: false,
+                    remaining: Math.max(0, dailyLimit - dailyUsed),
+                    resetTime: Date.now() + (ttl * 1000)
+                };
+            }
+
+            if (monthlyUsed + tokensToUse > monthlyLimit) {
+                const ttl = await redisClient.ttl(monthlyKey);
+                return {
+                    allowed: false,
+                    remaining: Math.max(0, monthlyLimit - monthlyUsed),
+                    resetTime: Date.now() + (ttl * 1000)
+                };
+            }
+
+            // update token usage
+            const pipeline = redisClient.pipeline();
+            pipeline.incrby(dailyKey, tokensToUse);
+            pipeline.expire(dailyKey, 24 * 60 * 60); // 1 day
+            pipeline.incrby(monthlyKey, tokensToUse);
+            pipeline.expire(monthlyKey, 30 * 24 * 60 * 60); // 30 days
+            await pipeline.exec();
+
+            return {
+                allowed: true,
+                remaining: Math.min(
+                    dailyLimit - (dailyUsed + tokensToUse),
+                    monthlyLimit - (monthlyUsed + tokensToUse)
+                ),
+                resetTime: Date.now() + (24 * 60 * 60 * 1000)
+            }
+
+            
+        } catch (error) {
+            console.error('Token budget error:', error);
+            // Fail open
+            return {
+                allowed: true,
+                remaining: dailyLimit,
+                resetTime: Date.now() + (24 * 60 * 60 * 1000)
+            }
+        }
+    }
 }
 
 export const userRateLimiter = new UserRateLimiter();
