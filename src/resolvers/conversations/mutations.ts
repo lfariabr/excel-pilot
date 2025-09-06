@@ -5,6 +5,7 @@ import Message from "../../models/Message";
 import { askOpenAI } from "../../services/openAi";
 import { formatTimestamp } from "../../utils/dateFormatter";
 import { userRateLimiter, rateLimitConfig } from "../../middleware/rateLimiter";
+import { TokenEstimator } from "../../utils/tokenEstimator";
 
 export const conversationsMutation = {
     startConversation: async (_: any, { title }: { title: string }, ctx: any) => {
@@ -71,12 +72,43 @@ export const conversationsMutation = {
             content: m.content,
         }));
 
+        // Estimate token usage before calling OpenAI
+        const estimatedTokens = TokenEstimator.estimateTokens(content, history);
+        console.log(`Estimated tokens: ${estimatedTokens}`);
+        const budgetResult = await userRateLimiter.checkUserTokenBudget(ctx.user.sub, estimatedTokens);
+        console.log(`Budget check:`, {
+            allowed: budgetResult.allowed,
+            remaining: budgetResult.remaining,
+            resetIn: Math.ceil((budgetResult.resetTime - Date.now()) / (1000 * 60 * 60)) + 'h'
+        });
+        if (!budgetResult.allowed) {
+            throw new GraphQLError(
+                `Daily token budget exceeded. Remaining: ${budgetResult.remaining} tokens. Resets in ${Math.ceil((budgetResult.resetTime - Date.now()) / (1000 * 60 * 60))} hours.`,
+                {
+                    extensions: {
+                        code: "TOKEN_BUDGET_EXCEEDED",
+                        remaining: budgetResult.remaining,
+                        resetTime: budgetResult.resetTime,
+                    }
+                }
+            );
+        }
+
         // v0.0.7 - openAI
         // call openAI
         const talkToOpenAI = await askOpenAI({
             history,
             userMessage: content,
         });
+
+        // update token budget
+        const actualTokens = TokenEstimator.getActualTokens(talkToOpenAI);
+        const tokenDifference = actualTokens - estimatedTokens;
+
+        if (tokenDifference > 0) {
+            // means we underestimated and need to add tokens
+            await userRateLimiter.checkUserTokenBudget(ctx.user.sub, tokenDifference);
+        }
 
         // persist assistant message
         const AIassistantMessage = await Message.create({
