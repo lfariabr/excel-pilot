@@ -21,9 +21,15 @@ export const conversationTypes = `#graphql
         usage: Usage
         createdAt: String!
     }
+    type PaginatedMessages {
+        messages: [Message!]!
+        totalCount: Int!
+        hasNextPage: Boolean!
+        hasPreviousPage: Boolean!
+    }
     type Query {
         conversations: [Conversation!]!
-        messages(conversationId: ID!): [Message!]!
+        messages(conversationId: ID!, limit: Int = 20, offset: Int = 0): PaginatedMessages!
     }
     type Mutation {
         startConversation(title: String): Conversation!

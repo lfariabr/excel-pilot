@@ -31,30 +31,34 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 ### **WORK IN PROGRESS**:
 - **v0.0.7** - OpenAI client (Agent, ChatMessage)
 > Goal: Implement OpenAI client to handle conversations and messages.
-    - [X] Create openAI service
-    - [X] Create model for Conversation and Message
-    - [X] Create GraphQL types to expose endpoints
-    - [X] Create resolvers (queries) integrated with ctx
-    - [X] Create resolvers (mutations) integrated with ctx
-    - [X] Run tests on Apollo Server
-    - [X] Create dateFormatter for timestamps on queries
-    - [X] Conversation list should be sorted by lastMessageAt descending
-    - [X] Messages should be sorted by createdAt descending
-    - [ ] Persist messages on askOpenAI
-    - [ ] Paginate messages on Query
-    - [ ] Plan on rate limiting on askOpenAI
-    - [ ] Add "title" field on askOpenAI from the first assistance reply
+- [X] Create openAI service
+- [X] Create model for Conversation and Message
+- [X] Create GraphQL types to expose endpoints
+- [X] Create resolvers (queries) integrated with ctx
+- [X] Create resolvers (mutations) integrated with ctx
+- [X] Run tests on Apollo Server
+- [X] Create dateFormatter for timestamps on queries
+- [X] Conversation list should be sorted by lastMessageAt descending
+- [X] Messages should be sorted by createdAt descending
+- [X] Plan on rate limiting on askOpenAI
+- [X] Recharge openAI credits (plus 10 USD)
+- [X] Plan on .json tune up based on Opera House for testing
+- [X] Run tests on OpenAI service and map results
+- [X] Send different messages on same conversation to check if responses follow the same conversation
+- [X] Search different conversation and see different responses
+- [X] Persist messages on askOpenAI
+- [ ] Paginate messages on Query
 
 - **v0.0.8** - Redis
 > Goal: Implement rate limiting on sendMessage mutation that calls OpenAI.
-    - [X] install dependencies: npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-peer-deps
-    - [X] Create `redis.ts` file and test connection
-    - [X] Create `test-redis.ts` file to validate connection
-    - [X] Implement rate limiting middleware (`UserRateLimiter`)
-    - [X] Create `test-rate-limiter.ts` file to validate usage
-    - [X] add rate limiting check to send Message mutation
-    - [X] Create `test-graphql-rate-limit.ts` file to validate usage
-    - [ ] estimate token usage before calling OpenAI
+- [X] install dependencies: npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-peer-deps
+- [X] Create `redis.ts` file and test connection
+- [X] Create `test-redis.ts` file to validate connection
+- [X] Implement rate limiting middleware (`UserRateLimiter`)
+- [X] Create `test-rate-limiter.ts` file to validate usage
+- [X] add rate limiting check to send Message mutation
+- [X] Create `test-graphql-rate-limit.ts` file to validate usage
+- [ ] estimate token usage before calling OpenAI
 
 ### **BACKLOG**:
 - **tbd** - Caching

@@ -1,56 +1,134 @@
 {
-  "name": "Concierge Pilot",
-  "location": "Excel's BM Head Office",
-  "phone": "+61 0403-278-880",
-  "summary": "Software Engineer with 10+ years leading technical projects end-to-end across Healthcare, Tech, Agencies, and Games. I break down complex backlogs with cross-functional teams and ship production-grade software in Python and JavaScript. I build systems that automate operations, drive revenue, and delight users.",
-  "current_focus": "Pursuing a Master's in Software Engineering and Artificial Intelligence (Torrens). Building AI-enabled products and automation—full‑stack apps, data pipelines, and chatbots—using Python, TypeScript, GraphQL, and modern DevOps. Open to sponsorship and engineering/TPM leadership roles.",
-  "skills": {
-    "languages": [
-      "Python",
-      "JavaScript",
-      "TypeScript"
-    ],
-    "frameworks": [
-      "Django",
-      "FastAPI",
-      "Flask"
-    ],
-    "APIs": [
-      "GraphQL (Apollo, Relay)",
-      "REST"
-    ],
-"projects": [
+  "venue": {
+    "name": "Sydney Opera House",
+    "location": "Bennelong Point, Sydney NSW 2000, Australia",
+    "phone": "+61 2 9250 7111",
+    "website": "https://www.sydneyoperahouse.com",
+    "emergency": "000 (Police/Fire/Ambulance)"
+  },
+  "overview": {
+    "description": "The Sydney Opera House is a multi-venue performing arts centre and UNESCO World Heritage Site. Opened in 1973, it hosts over 1,500 performances annually across opera, theatre, music, dance, and contemporary arts.",
+    "architect": "Jørn Utzon",
+    "opened": "October 20, 1973",
+    "unesco_status": "World Heritage Site since 2007"
+  },
+  "faqs": [
     {
-      "name": "Portfolio (MERN/Next.js)",
-      "description": "Full‑stack portfolio built with Next.js, Node.js, GraphQL, and OpenAI. Features secure auth, dynamic blog/articles, project showcase, and an AI-powered chatbot with rate limiting.",
-      "impact": "Public, open-source; used to demonstrate engineering capabilities and DX."
-    }
-  ],
-  "experience": [
-    {
-      "title": "Software Engineer / Project Lead",
-      "company": "Pró-Corpo Estética Avançada",
-      "location": "Remote",
-      "duration": "Dec 2018 – May 2025",
-      "achievements": [
-        "Designed and scaled Konquista (Django + Celery/Redis)",
-        "Built dashboards and lead scoring tools",
-        "Managed $500K+ annual ad budget with BI dashboards",
-        "Automated ad campaigns and analytics pipelines",
-        "Integrated GenAI assistant into WhatsApp workflows"
-      ]
-    }
-  ],
-  "education": [
-    {
-      "degree": "Master's in Software Engineering and AI",
-      "institution": "Torrens University Australia",
-      "years": "2025–2027"
+      "id": 1,
+      "question": "What are the Opera House opening hours?",
+      "answer": "The Opera House is open daily from 9:00 AM to 8:30 PM (or until the end of the last performance). Box Office hours are 9:00 AM to 8:30 PM Monday to Saturday, and 10:00 AM to 6:00 PM on Sundays."
     },
     {
-      "degree": "BA in Systems Analysis and Development",
-      "institution": "UNINOVE",
-      "years": "2019–2022"
+      "id": 2,
+      "question": "How do I book tickets for performances?",
+      "answer": "Tickets can be booked online at sydneyoperahouse.com, by phone at +61 2 9250 7777, or in person at the Box Office. We recommend booking in advance as popular shows sell out quickly. Group discounts are available for 10+ people."
+    },
+    {
+      "id": 3,
+      "question": "What guided tours are available?",
+      "answer": "We offer several tour options: 1) Standard Guided Tours (1 hour, $43 adults) - daily from 9:00 AM to 5:00 PM; 2) Premium Guided Tours (1.5 hours, $65 adults) - includes exclusive areas; 3) Access All Areas Tours (2.5 hours, $175 adults) - behind-the-scenes experience. Tours run in multiple languages including English, Mandarin, Japanese, French, German, and Spanish."
+    },
+    {
+      "id": 4,
+      "question": "Is the Opera House wheelchair accessible?",
+      "answer": "Yes, the Opera House is fully wheelchair accessible. We provide wheelchair access to all public areas, accessible seating in all venues, accessible parking spaces, and accessible restrooms. Companion card holders receive free tickets. Contact our Access team at +61 2 9250 7111 for specific assistance."
+    },
+    {
+      "id": 5,
+      "question": "What dining options are available?",
+      "answer": "The Opera House offers several dining venues: 1) Bennelong Restaurant - fine dining with harbour views; 2) Opera Kitchen - casual outdoor food court with 16 different cuisines; 3) Opera Bar - drinks and light meals with harbour views; 4) Portside Sydney - contemporary Australian cuisine; 5) Various bars and cafés throughout the building. Reservations recommended for restaurants."
+    },
+    {
+      "id": 6,
+      "question": "Where can I park at the Opera House?",
+      "answer": "Limited parking is available at the Opera House Car Park (Entry via Macquarie Street). Rates: $25 for 0-2 hours, $35 for 2-4 hours, $45 for 4+ hours. We recommend public transport: Circular Quay Station (train/ferry) is a 5-minute walk. Bus routes 333, 380, 389, 392, 394, 396, 397, 399 stop nearby."
+    },
+    {
+      "id": 7,
+      "question": "What should I wear to a performance?",
+      "answer": "There's no strict dress code, but we encourage smart casual to formal attire depending on the performance. For opera and classical concerts, many guests dress formally. For contemporary shows, smart casual is appropriate. Comfortable shoes are recommended as there are many stairs. Avoid large bags and prohibited items."
+    },
+    {
+      "id": 8,
+      "question": "Can I take photos inside the Opera House?",
+      "answer": "Photography is permitted in public areas and foyers, but strictly prohibited during performances and in auditoriums. Flash photography is never allowed. Professional photography requires prior approval. The iconic exterior and harbour views are perfect for photos from the forecourt and surrounding walkways."
+    },
+    {
+      "id": 9,
+      "question": "What is the history behind the Opera House design?",
+      "answer": "Danish architect Jørn Utzon won the 1957 international design competition with his revolutionary shell design. Construction began in 1959 but faced engineering challenges with the roof structure. Utzon left the project in 1966, and it was completed by Peter Hall. The distinctive shells were inspired by orange segments and represent billowing sails, reflecting Sydney's maritime heritage."
+    },
+    {
+      "id": 10,
+      "question": "How many performance venues are inside?",
+      "answer": "The Opera House contains six main performance venues: 1) Concert Hall (2,679 seats) - largest venue for symphony, chamber music; 2) Joan Sutherland Theatre (1,507 seats) - opera and ballet; 3) Drama Theatre (544 seats) - plays and smaller productions; 4) Playhouse (398 seats) - intimate theatre; 5) Utzon Room (210 seats) - chamber music and recitals; 6) Biennale Hall (flexible space for contemporary arts)."
+    },
+    {
+      "id": 11,
+      "question": "What items are prohibited inside the Opera House?",
+      "answer": "Prohibited items include: weapons, large bags (over 25cm x 35cm x 16cm), food and drinks (except water), recording devices, cameras in auditoriums, laser pointers, and aerosols. Security screening is in place. Small bags are permitted but subject to search. Water bottles must be plastic, not glass."
+    },
+    {
+      "id": 12,
+      "question": "Are there family-friendly performances and facilities?",
+      "answer": "Yes! We offer regular family concerts, children's theatre, and educational programs. Baby-friendly performances welcome infants under 12 months. Family restrooms and baby change facilities are available throughout the building. The Opera House also runs school holiday programs and workshops for children aged 3-17."
+    },
+    {
+      "id": 13,
+      "question": "How early should I arrive for a performance?",
+      "answer": "We recommend arriving 30-45 minutes before performance start time. This allows time for parking, security screening, collecting tickets, finding your seat, and enjoying pre-show drinks. Latecomers may not be admitted until a suitable break in the performance. Some venues have strict late admission policies."
+    },
+    {
+      "id": 14,
+      "question": "What public transport options are available?",
+      "answer": "The Opera House is easily accessible by public transport: 1) Train: Circular Quay Station (5-minute walk); 2) Ferry: Circular Quay Wharf (5-minute walk) - scenic harbour approach; 3) Bus: Multiple routes stop at Circular Quay; 4) Light Rail: Circular Quay Light Rail Station. An Opal card provides seamless travel across all transport modes."
+    },
+    {
+      "id": 15,
+      "question": "Can I get a refund or exchange my tickets?",
+      "answer": "Ticket exchange is possible up to 24 hours before the performance for a $10 fee per ticket, subject to availability. Refunds are generally not available unless a performance is cancelled. We recommend purchasing ticket insurance at the time of booking. Special circumstances may be considered on a case-by-case basis."
+    },
+    {
+      "id": 16,
+      "question": "What are the best spots for photos around the Opera House?",
+      "answer": "Top photo locations include: 1) Mrs Macquaries Chair - classic harbour view; 2) Circular Quay - ferry and Opera House together; 3) Harbour Bridge walkway - elevated perspective; 4) Royal Botanic Gardens - multiple angles; 5) Opera House forecourt - close-up architectural details; 6) Cahill Expressway lookout - panoramic city view. Golden hour (sunrise/sunset) provides the best lighting."
+    },
+    {
+      "id": 17,
+      "question": "Are there gift shops and what can I buy?",
+      "answer": "The Opera House Shop offers exclusive merchandise including books, music, jewelry, homewares, children's items, and architectural gifts. Popular items include Opera House-shaped tea infusers, indigenous art pieces, classical music recordings, and architectural prints. The shop is open daily and online shopping is available with international shipping."
+    },
+    {
+      "id": 18,
+      "question": "What COVID-19 safety measures are in place?",
+      "answer": "Current measures include: enhanced cleaning protocols, hand sanitizer stations throughout the building, improved ventilation systems, and flexible booking policies. Requirements may change based on government guidelines. Check our website for the latest updates before your visit. We recommend checking health requirements for international visitors."
+    },
+    {
+      "id": 19,
+      "question": "How can I become a member or supporter?",
+      "answer": "Join as an Opera House Member for exclusive benefits including priority booking, member events, discounts on dining and merchandise, and behind-the-scenes experiences. Membership starts at $99 annually. Corporate partnerships and major gift opportunities are available through our Development team. Contact +61 2 9250 7070 for membership information."
+    },
+    {
+      "id": 20,
+      "question": "What special events and festivals does the Opera House host?",
+      "answer": "Annual highlights include: Vivid Sydney (light festival, May-June), Festival of Dangerous Ideas (August), All About Women (March), Sydney Festival (January), and Lunar New Year celebrations. The Opera House also hosts world premieres, artist residencies, and special anniversary events. Subscribe to our newsletter for event announcements and exclusive presale access."
     }
-    ]
-}}
+  ],
+  "contact_info": {
+    "general_inquiries": "+61 2 9250 7111",
+    "box_office": "+61 2 9250 7777",
+    "tours": "+61 2 9250 7250",
+    "accessibility": "+61 2 9250 7111",
+    "groups": "+61 2 9250 7777",
+    "email": "info@sydneyoperahouse.com",
+    "address": "Sydney Opera House, Bennelong Point, Sydney NSW 2000"
+  },
+  "quick_facts": {
+    "annual_visitors": "8.2 million",
+    "performances_per_year": "1,500+",
+    "construction_cost": "$102 million AUD (1973)",
+    "roof_tiles": "1,056,006 ceramic tiles",
+    "construction_period": "1959-1973",
+    "world_heritage_listing": "2007"
+  }
+}
