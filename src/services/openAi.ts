@@ -1,52 +1,78 @@
 // src/services/openai.ts
 import OpenAI from "openai";
 import briefing from "../data/briefing.json";
+import { GraphQLError } from "graphql";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
-// micro cache for the big briefing
-let cachedBriefing: string | null = null;
-function systemPrompt(): string {
-  cachedBriefing ??= JSON.stringify(briefing, null, 2);
-  return `You are Excel's BM Concierge Personal Assistant.
+// Cache system prompt
+let cachedSystemPrompt: string | null = null;
+function getSystemPrompt(): string {
+  if(!cachedSystemPrompt){
+    const briefingText = JSON.stringify(briefing, null, 2);
+    cachedSystemPrompt = `You are Excel's BM Concierge Personal Assistant.
 Follow these rules and only answer using this knowledge base (respond in Markdown, concise sections/bullets):
 
-${cachedBriefing}`;
+${briefingText}`;
+  }
+  return cachedSystemPrompt;
 }
 
 /**
- * One-shot chat using Responses API.
- * Pass prior chat turns as { role: 'user'|'assistant'|'system', content: string }.
+ * Chat with openAI using chat completions API
+ * Properly handles conversation history and returns consistant format
  */
 export async function askOpenAI({
   history = [],
   userMessage,
   model = "gpt-4o-mini",           // fast+cheap default
-  temperature = 0.5,
-  maxOutputTokens = 600,
+  temperature = 0.7,
+  maxTokens = 600,
 }: {
   history?: Array<{ role: "user" | "assistant" | "system"; content: string }>;
   userMessage: string;
   model?: string;
   temperature?: number;
-  maxOutputTokens?: number;
+  maxTokens?: number;
 }) {
-  const input = [...history, { role: "user", content: userMessage }];
+  try {
+    // Build messages array with system prompt first!
+    const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+      { role: "system", content: getSystemPrompt() },
+      ...history.reverse(), // since my query shows newest first
+      { role: "user", content: userMessage },
+    ];
 
-  const res = await openai.responses.create({
-    model,
-    instructions: systemPrompt(),   // same idea as your getSystemPrompt()
-    input: userMessage,                          // multi-turn: array of role/content items
-    temperature,
-    // Responses API uses max_output_tokens (not max_tokens)
-    max_output_tokens: maxOutputTokens,
-  });
+    const completion = await openai.chat.completions.create({
+      model,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    });
 
-  return {
-    text: res.output_text ?? "",
-    usage: res.usage ?? null,       // input/output/total tokens if present
-    model: (res as any).model ?? model,
-  };
+    const choice = completion.choices[0];
+    if (!choice?.message?.content) {
+      throw new Error("No response from OpenAI");
+    }
+
+    return {
+      text: choice.message.content,
+      usage: completion.usage ? {
+        input_tokens: completion.usage.prompt_tokens,
+        output_tokens: completion.usage.completion_tokens,
+        total_tokens: completion.usage.total_tokens,
+      } : null,
+      model: completion.model,
+      finishReason: choice.finish_reason,
+    };
+  } catch (error) {
+    console.error("Error in askOpenAI:", error);
+    throw new GraphQLError("Failed to get response from OpenAI", {
+      extensions: {
+        code: "OPENAI_ERROR"
+      }
+    });
+  }
 }
 
 export default openai;

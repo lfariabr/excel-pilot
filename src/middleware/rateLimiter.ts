@@ -74,7 +74,7 @@ export class UserRateLimiter {
         const monthlyKey = `token_budget:monthly:${userId}`;
 
         // budget limits
-        const dailyLimit = 50000; // 50k tokens per day (~$1.00)
+        const dailyLimit = 100000; // 50k tokens per day (~$1.00)
         const monthlyLimit = 1000000; // 1M tokens per month (~$20.00)
 
         try {

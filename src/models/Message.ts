@@ -7,8 +7,8 @@ export interface IChatMessage extends Document {
     content: string;
     aiModel?: string; // optional: user messages won't have a aiModel
     usage?: {
-        input_tokens?: number;
-        output_tokens?: number;
+        prompt_tokens?: number;
+        completion_tokens?: number;
         total_tokens?: number;
     };
     createdAt: Date;
@@ -31,8 +31,8 @@ const ChatMessageSchema = new Schema<IChatMessage>({
             return this.role === "assistant";
         } },
     usage: {
-        input_tokens: { type: Number },
-        output_tokens: { type: Number },
+        prompt_tokens: { type: Number },
+        completion_tokens: { type: Number },
         total_tokens: { type: Number }
     },
 },

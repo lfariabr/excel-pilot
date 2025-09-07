@@ -30,10 +30,39 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.8** - Redis (Rate Limiting, Token Budget - daily and monthly per user)
 
 ### **WORK IN PROGRESS**:
-- tbd
+- **v0.0.9** - OpenAI Core
+- [X] persist messages on askOpenAI
+    - [X] OpenAI service updated to Chat Completions API
+    - [X] Usage field mapping fixed
+    - [X] Test shows proper responses and usage tracking
+    - [X] No more persistence errors in sendMessage
+- [ ] Paginate messages: build a cursor-based pagination system that:
+    - [ ] Loads messages in chunks (e.g., 20 at a time)
+    - [ ] Uses cursor (last message ID) instead of page numbers
+    - [ ] Provides hasNextPage and nextCursor for infinite scroll
+    - [ ] Maintains chronological order (newest first)
+- [ ] add title field on askOpenAI from first assistance reply
+- [ ] add summary field on conversation
 
 ### **BACKLOG**:
-- **tbd** - Caching
+- **tbd** - Caching (Redis-based)
+- Cache similar user queries (24h TTL)
+- Cache conversation context
+- Cache system prompts and briefing data
+
 - **tbd** - Docker
+- Containerize the app
+- Multi-stage build
+- Docker compose with MongoDB and Redis
+- Environment variables
+
 - **tbd** - Winston
+- Request/response logging
+- Performance metrics
+- Error tracking
+- Rate limit events
+
+- **tbd** - Jest + Testing
+- **tbd** - Study Jenkins + GitHub Actions
+
 
