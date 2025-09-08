@@ -51,7 +51,12 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Create utils/pagination.ts with cursor-based pagination logic and connection builder
     - [X] Update resolvers (message query) to use cursor-based pagination
     - [X] Create test-pagination.ts and run it
-- [ ] add title field on askOpenAI from first assistance reply
+- [X] add title field on askOpenAI from first assistance reply
+    - [X] Update conversation model with the field
+    - [X] Create titleGenerator.ts with generateConversationTitle and updateConversationTitle functions
+    - [X] Wired up the titleGenerator to conversations (startConversation and sendMessage mutations)
+    - [X] Refactored startConversation to use askOpenAI instead of simply receiving "title" from user
+    - [X] Test titleGenerator on a file
 - [ ] add summary field on conversation
 
 ### **BACKLOG**:

@@ -7,7 +7,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 // Cache system prompt
 let cachedSystemPrompt: string | null = null;
-function getSystemPrompt(): string {
+export function getSystemPrompt(): string {
   if(!cachedSystemPrompt){
     const briefingText = JSON.stringify(briefing, null, 2);
     cachedSystemPrompt = `You are Excel's BM Concierge Personal Assistant.
@@ -39,7 +39,6 @@ export async function askOpenAI({
   try {
     // Build contextual instructions from history
     let contextualInstructions = getSystemPrompt();
-    console.log("Contextual instructions:", contextualInstructions);
 
     if (history.length > 0) {
       const conversationContext = history.reverse()

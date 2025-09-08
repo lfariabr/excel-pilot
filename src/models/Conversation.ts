@@ -5,10 +5,10 @@ export interface IConversation extends Document {
     title?: string;
     systemPrompt: string;
     lastMessageAt: Date;
+    summary?: string;
     createdAt: Date;
     updatedAt: Date;
     // Extra options
-    // summary?: string;
     // settings?: { model, temperature }
     // archived?: boolean
     // deletedAt?: Date

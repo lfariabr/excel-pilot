@@ -46,7 +46,8 @@ export const conversationTypes = `#graphql
         ): MessageConnection!
     }
     type Mutation {
-        startConversation(title: String): Conversation!
+        # startConversation(title: String): Conversation!
+        startConversation(content: String!): Message!
         sendMessage(conversationId: ID!, content: String!, aiModel: String): Message!
     }
 `

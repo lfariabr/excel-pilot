@@ -2,33 +2,102 @@ import { GraphQLError } from "graphql";
 import { requireAuth } from "../../utils/guards";
 import Conversation from "../../models/Conversation";
 import Message from "../../models/Message";
-import { askOpenAI } from "../../services/openAi";
 import { formatTimestamp } from "../../utils/dateFormatter";
 import { userRateLimiter, rateLimitConfig } from "../../middleware/rateLimiter";
 import { TokenEstimator } from "../../utils/tokenEstimator";
+import { generateConversationTitle, updateConversationTitle } from "../../services/titleGenerator";
+import { getSystemPrompt, askOpenAI } from "../../services/openAi";
 
 export const conversationsMutation = {
-    startConversation: async (_: any, { title }: { title: string }, ctx: any) => {
+    startConversation: async (_: any, { content }: { content: string }, ctx: any) => {
         requireAuth(ctx);
         if (!ctx.user) {
             throw new GraphQLError("UNAUTHENTICATED");
         }
+
+        // Add after authentication, before calling askOpenAI:
+        const rateLimitResult = await userRateLimiter.checkUserLimit(ctx.user.sub, 'openai');
+        if (!rateLimitResult.allowed) {
+            throw new GraphQLError(
+                `Rate limit exceeded. You can make ${rateLimitConfig.openai.max} OpenAI requests per minute. Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
+                {
+                    extensions: {
+                        code: "RATE_LIMIT_EXCEEDED",
+                        remaining: rateLimitResult.remaining,
+                        resetTime: rateLimitResult.resetTime,
+                    }
+                }
+            );
+        }
+
+        // Create new conversation (without title initially)
         const conversation = new Conversation({
             userId: ctx.user.sub,
-            title,
-            systemPrompt: "You are Excel's BM Concierge Personal Assistant.",
+            systemPrompt: getSystemPrompt(),
             lastMessageAt: new Date(),
         });
-        // Format timestamps in the mutation result
-        const convObj = conversation.toObject() as any;
         await conversation.save();
+
+        // Create user message
+        const userMessage = await Message.create({
+            conversationId: conversation._id,
+            userId: ctx.user.sub,
+            role: "user",
+            content,
+        });
+        
+        // Update token budget
+        const estimatedTokens = TokenEstimator.estimateTokens(content, []);
+        const budgetResult = await userRateLimiter.checkUserTokenBudget(ctx.user.sub, estimatedTokens);
+        if (!budgetResult.allowed) {
+            throw new GraphQLError(
+                `Daily token budget exceeded. Remaining: ${budgetResult.remaining} tokens. Resets in ${Math.ceil((budgetResult.resetTime - Date.now()) / (1000 * 60 * 60))} hours.`,
+                {
+                    extensions: {
+                        code: "TOKEN_BUDGET_EXCEEDED",
+                        remaining: budgetResult.remaining,
+                        resetTime: budgetResult.resetTime,
+                    }
+                }
+            );
+        }
+        
+        // Call openAI (No history for first message)
+        const talkToOpenAI = await askOpenAI({
+            userMessage: content,
+            history: [],
+        });
+
+        // Persist assistant message
+        const AIassistantMessage = await Message.create({
+            conversationId: conversation._id,
+            userId: ctx.user.sub,
+            role: "assistant",
+            content: talkToOpenAI.text,
+            aiModel: talkToOpenAI.model,
+            usage: talkToOpenAI.usage
+                ? {
+                    inputTokens: talkToOpenAI.usage.input_tokens,
+                    outputTokens: talkToOpenAI.usage.output_tokens,
+                    totalTokens: talkToOpenAI.usage.total_tokens,
+                }
+                : undefined,
+        });
+
+        // Generate title
+        generateConversationTitle(content, talkToOpenAI.text)
+            .then(title => updateConversationTitle((conversation._id as any).toString(), title))
+            .catch(error => console.error("Error generating conversation title:", error));
+
+        // Bump conversation timestamps
+        await Conversation.updateOne({ _id: conversation._id }, { lastMessageAt: new Date() });
+
+        const messageObj = AIassistantMessage.toObject() as any;
         return {
-            ...convObj,
-            id: convObj._id.toString(),
-            createdAt: formatTimestamp(convObj.createdAt),
-            updatedAt: formatTimestamp(convObj.updatedAt),
-            lastMessageAt: formatTimestamp(convObj.lastMessageAt)
-        };
+            ...messageObj,
+            id: messageObj._id.toString(),
+            createdAt: formatTimestamp(messageObj.createdAt),
+        }
     },
     sendMessage: async (_: any, { conversationId, content }: { conversationId: string, content: string }, ctx: any) => {
         // v0.0.6 - Authentication
@@ -125,6 +194,17 @@ export const conversationsMutation = {
                 }
                 : undefined,
         });
+
+        // generate title
+        if (!conversation.title) {
+            const messageCount = await Message.countDocuments({ conversationId });
+            if (messageCount === 2) { // 1 user message + 1 AI message = first conversation
+                // generatle the title in background (don't wait and don't slow down the response)
+                generateConversationTitle(content, talkToOpenAI.text)
+                    .then(title => updateConversationTitle(conversationId, title))
+                    .catch(error => console.error("Error generating conversation title:", error));
+            }
+        }
 
         // bump conversation timestamps
         await Conversation.updateOne({ _id: conversationId }, { lastMessageAt: new Date() });
