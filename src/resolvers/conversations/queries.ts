@@ -3,6 +3,7 @@ import { requireAuth } from "../../utils/guards";
 import { formatTimestamp } from "../../utils/dateFormatter";
 import Conversation from "../../models/Conversation";
 import Message from "../../models/Message";
+import { buildCursorQuery, createConnection } from "../../utils/pagination";
 
 export const conversationsQuery = {
     // get all conversations
@@ -12,7 +13,7 @@ export const conversationsQuery = {
         if (!ctx.user) {
             throw new GraphQLError("UNAUTHENTICATED");
         }
-        const conversations = await Conversation.find({ userId: ctx.user.sub }).sort({ updatedAt: -1 });
+        const conversations = await Conversation.find({ userId: ctx.user.sub }).sort({ updatedAt: -1 , _id: -1 });
         
         // Format timestamps in the query result
         const conversations_result = conversations.map(conversation => {
@@ -30,26 +31,96 @@ export const conversationsQuery = {
     },
     // get messages
     // I have defined MESSAGES as the turns inside a conversation
-    messages: async (_:any, {conversationId, limit = 20, offset = 0 } : { conversationId: string, limit?: number, offset?: number }, ctx: any) => {
+    // messages: async (_: any, {conversationId, limit = 20, offset = 0 } : { 
+    //     conversationId: string, 
+    //     limit?: number, 
+    //     offset?: number 
+    // }, ctx: any) => {
+    //     requireAuth(ctx);
+    //     if (!ctx.user) {
+    //         throw new GraphQLError("UNAUTHENTICATED");
+    //     }
+    //     const conversation = await Conversation.findById(conversationId);
+    //     if (!conversation || String(conversation.userId) !== ctx.user.sub) {
+    //         throw new GraphQLError("FORBIDDEN");
+    //     }
+        
+    //     // Get total count for pagination metadata:
+    //     const totalCount = await Message.countDocuments({ conversationId });
+
+    //     // Previous pagination logic:
+    //     // const messages = await Message.find({ conversationId }).sort({ createdAt: -1 });
+        
+    //     // Get paginated messages:
+    //     const messages = await Message.find({ conversationId })
+    //         .sort({ createdAt: -1 })
+    //         .skip(offset)
+    //         .limit(limit);
+
+    //     // Format timestamps in the query result
+    //     const messages_result = messages.map(message => {
+    //         const messageObj = message.toObject() as any;
+    //         return {
+    //             ...messageObj,
+    //             id: messageObj._id.toString(),
+    //             createdAt: formatTimestamp(messageObj.createdAt)
+    //         };
+    //     });
+
+    //     // Pagination metadata:
+    //     const hasNextPage = offset + limit < totalCount;
+    //     const hasPreviousPage = offset > 0;
+
+    //     return {
+    //         messages: messages_result,
+    //         totalCount,
+    //         hasNextPage,
+    //         hasPreviousPage
+    //     };
+    // },
+
+    // get messages using cursor pagination
+    // I have defined MESSAGES as the turns inside a conversation
+    messages: async (_: any, {conversationId, first = 20, after, before, last }: {
+        conversationId: string;
+        first?: number;
+        after?: string;
+        before?: string;
+        last?: number;
+    }, ctx: any) => {
         requireAuth(ctx);
         if (!ctx.user) {
             throw new GraphQLError("UNAUTHENTICATED");
         }
+
+        // Verify user owns the conversation
         const conversation = await Conversation.findById(conversationId);
         if (!conversation || String(conversation.userId) !== ctx.user.sub) {
             throw new GraphQLError("FORBIDDEN");
         }
         
-        // Get total count for pagination metadata:
-        const totalCount = await Message.countDocuments({ conversationId });
+        // Build cursor-based query:
+        const cursorQuery = buildCursorQuery(after);
+        const query = {
+            conversationId,
+            ...cursorQuery
+        };
 
-        // Previous pagination logic:
-        // const messages = await Message.find({ conversationId }).sort({ createdAt: -1 });
-        // Get paginated messages:
-        const messages = await Message.find({ conversationId })
-            .sort({ createdAt: -1 })
-            .skip(offset)
-            .limit(limit);
+        // Fetch messages (newestfirst and limited by first +1) to check hasNextPage
+        const messages = await Message.find(query)
+            .sort({ createdAt: -1, _id: -1 }) // newest first
+            .limit(first + 1); // +1 to check hasNextPage
+            // TODO implement:
+            // .select({ conversationId: 1, userId: 1, role: 1, content: 1, aiModel: 1, usage: 1, createdAt: 1 })
+            // .lean();
+        
+        // Check if there are more messages
+        const hasNextPage = messages.length > first;
+        const hasPreviousPage = !!after;
+
+        if (hasNextPage) {
+            messages.pop(); // Remove the extra message
+        }
 
         // Format timestamps in the query result
         const messages_result = messages.map(message => {
@@ -61,16 +132,10 @@ export const conversationsQuery = {
             };
         });
 
-        // Pagination metadata:
-        const hasNextPage = offset + limit < totalCount;
-        const hasPreviousPage = offset > 0;
-
-        return {
-            messages: messages_result,
-            totalCount,
-            hasNextPage,
-            hasPreviousPage
-        };
+        // Create connection
+        const connection = createConnection(messages_result, { first, after, before, last }, messages.length, hasNextPage, hasPreviousPage);
+        
+        return connection;
     },
 }
         

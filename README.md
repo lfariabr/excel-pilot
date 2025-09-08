@@ -42,11 +42,15 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Update Message model to match usage field
     - [X] Fix multi-turn conversation handling
     - [X] Update tests and Run
-- [ ] Paginate messages: build a cursor-based pagination system that:
-    - [ ] Loads messages in chunks (e.g., 20 at a time)
-    - [ ] Uses cursor (last message ID) instead of page numbers
-    - [ ] Provides hasNextPage and nextCursor for infinite scroll
-    - [ ] Maintains chronological order (newest first)
+- [X] Paginate messages: build a cursor-based pagination system that:
+    - [X] Loads messages in chunks (e.g., 20 at a time)
+    - [X] Uses cursor (last message ID) instead of page numbers
+    - [X] Provides hasNextPage and nextCursor for infinite scroll
+    - [X] Maintains chronological order (newest first)
+    - [X] Update GraphQL schema adding MessageConnection, MessageEdge and PageInfo types
+    - [X] Create utils/pagination.ts with cursor-based pagination logic and connection builder
+    - [X] Update resolvers (message query) to use cursor-based pagination
+    - [X] Create test-pagination.ts and run it
 - [ ] add title field on askOpenAI from first assistance reply
 - [ ] add summary field on conversation
 
