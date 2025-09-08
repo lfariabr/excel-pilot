@@ -36,6 +36,12 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Usage field mapping fixed
     - [X] Test shows proper responses and usage tracking
     - [X] No more persistence errors in sendMessage
+- [X] study OpenAI Responses API
+    - [X] update askOpenAI to use OpenAI Responses API
+    - [X] Revert openAI service to responses API
+    - [X] Update Message model to match usage field
+    - [X] Fix multi-turn conversation handling
+    - [X] Update tests and Run
 - [ ] Paginate messages: build a cursor-based pagination system that:
     - [ ] Loads messages in chunks (e.g., 20 at a time)
     - [ ] Uses cursor (last message ID) instead of page numbers
@@ -45,24 +51,29 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - [ ] add summary field on conversation
 
 ### **BACKLOG**:
+
 - **tbd** - Caching (Redis-based)
-- Cache similar user queries (24h TTL)
-- Cache conversation context
-- Cache system prompts and briefing data
+    - Cache similar user queries (24h TTL)
+    - Cache conversation context
+    - Cache system prompts and briefing data
 
 - **tbd** - Docker
-- Containerize the app
-- Multi-stage build
-- Docker compose with MongoDB and Redis
-- Environment variables
+    - Containerize the app
+    - Multi-stage build
+    - Docker compose with MongoDB and Redis
+    - Environment variables
 
 - **tbd** - Winston
-- Request/response logging
-- Performance metrics
-- Error tracking
-- Rate limit events
+    - Request/response logging
+    - Performance metrics
+    - Error tracking
+    - Rate limit events
 
 - **tbd** - Jest + Testing
+    - Unit tests
+    - Integration tests
+    - E2E tests
+
 - **tbd** - Study Jenkins + GitHub Actions
 
 
