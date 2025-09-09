@@ -19,6 +19,7 @@ const ConversationSchema = new Schema<IConversation>({
     title: { type: String },
     systemPrompt: { type: String },
     lastMessageAt: { type: Date, default: Date.now, index: true },
+    summary: { type: String },
 },
     { timestamps: true }
 );

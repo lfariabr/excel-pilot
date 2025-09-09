@@ -2,6 +2,7 @@ export const conversationTypes = `#graphql
     type Conversation {
         id: ID!
         title: String
+        summary: String
         createdAt: String!
         updatedAt: String!
         lastMessageAt: String!

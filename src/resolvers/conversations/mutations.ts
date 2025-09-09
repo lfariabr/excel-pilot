@@ -1,12 +1,13 @@
 import { GraphQLError } from "graphql";
 import { requireAuth } from "../../utils/guards";
-import Conversation from "../../models/Conversation";
 import Message from "../../models/Message";
+import Conversation from "../../models/Conversation";
 import { formatTimestamp } from "../../utils/dateFormatter";
-import { userRateLimiter, rateLimitConfig } from "../../middleware/rateLimiter";
 import { TokenEstimator } from "../../utils/tokenEstimator";
-import { generateConversationTitle, updateConversationTitle } from "../../services/titleGenerator";
 import { getSystemPrompt, askOpenAI } from "../../services/openAi";
+import { userRateLimiter, rateLimitConfig } from "../../middleware/rateLimiter";
+import { generateConversationTitle, updateConversationTitle } from "../../services/titleGenerator";
+import { generateConversationSummary, updateConversationSummary } from "../../services/summaryGenerator";
 
 export const conversationsMutation = {
     startConversation: async (_: any, { content }: { content: string }, ctx: any) => {
@@ -204,6 +205,15 @@ export const conversationsMutation = {
                     .then(title => updateConversationTitle(conversationId, title))
                     .catch(error => console.error("Error generating conversation title:", error));
             }
+        }
+        // generate summary (separate from title logic)
+        const messageCount = await Message.countDocuments({ conversationId });
+        console.log("Message count:", messageCount);
+        if (messageCount >= 10 && (messageCount - 10) % 5 === 0) {
+            // Generate summary at 10, 15, 20, 25... messages
+            generateConversationSummary(history)
+                .then(summary => updateConversationSummary(conversationId, summary))
+                .catch(error => console.error("Error generating conversation summary:", error));
         }
 
         // bump conversation timestamps

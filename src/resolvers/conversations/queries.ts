@@ -21,9 +21,11 @@ export const conversationsQuery = {
             return {
                 ...convObj,
                 id: convObj._id.toString(),
+                title: convObj.title,
+                summary: convObj.summary,
                 createdAt: formatTimestamp(convObj.createdAt),
                 updatedAt: formatTimestamp(convObj.updatedAt),
-                lastMessageAt: formatTimestamp(convObj.lastMessageAt)
+                lastMessageAt: formatTimestamp(convObj.lastMessageAt),
             };
         });
 

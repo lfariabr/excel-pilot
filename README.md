@@ -58,6 +58,11 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - [X] Refactored startConversation to use askOpenAI instead of simply receiving "title" from user
     - [X] Test titleGenerator on a file
 - [ ] add summary field on conversation
+    - [X] Add summary field to conversation type
+    - [X] Create summaryGenerator.ts with generateConversationSummary and updateConversationSummary functions
+    - [ ] Wired up the summaryGenerator to conversations (sendMessage mutations - logic is going to be to generate summaries after 10+ messages and keep it updated on the go - 5 messages after that)
+    - [ ] Background processing, so we don't block the main thread
+    - [ ] Test summaryGenerator on a file
 
 ### **BACKLOG**:
 
