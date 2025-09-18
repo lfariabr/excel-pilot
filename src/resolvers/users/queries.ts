@@ -22,7 +22,8 @@ export const usersQuery = {
     },
     
     // get user by id
-    user: async (_: any, { id }: { id: string }) => {
+    user: async (_: any, { id }: { id: string }, ctx: any) => {
+        requireAuth(ctx);
         try {
             console.log('🔍 GraphQL user query called with id:', id);
             const user = await UserModel.findById(id).lean();
