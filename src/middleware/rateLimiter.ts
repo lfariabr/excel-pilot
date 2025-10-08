@@ -1,8 +1,14 @@
 import { redisClient } from '../redis';
 
 export const rateLimitConfig = {
-    openai: { windowMs: 60 * 1000, max: 10, }, // 10 requests per minute (window)
-    messages: { windowMs: 60 * 1000, max: 30,} // 30 requests per minute (window)
+    openai: { 
+        windowMs: 60 * 1000,
+        max: 10, // 10 requests per minute (window)
+    }, 
+    messages: { 
+        windowMs: 60 * 1000, 
+        max: 30, // 30 requests per minute (window)
+    }, 
 };
 
 // Rate limit result interface
@@ -24,34 +30,36 @@ export class UserRateLimiter {
         const config = rateLimitConfig[limitType];
         
         try {
-            // get current count
-            const currentCount = await redisClient.get(key);
-            const count = currentCount ? parseInt(currentCount) : 0;
-
-            // check if limit is exceeded
-            if (count >= config.max) {
-                const ttl = await redisClient.ttl(key);
-                // TTL tells us how many seconds are left, when the window resets
-                return {
-                    allowed: false,
-                    remaining: 0,
-                    resetTime: Date.now() + (ttl * 1000)
-                };
-            }
+            // pre-check removed to avoid extra RTT; rely on INCR-first + TTL-based decisions
 
             //  Increment counter (creates if doesn't exist)
             // INCR is atomic - no race conditions!!!
             const newCount = await redisClient.incr(key);
             
-            // set expiration on the first request
+            // First use in this window: attach the window TTL so the counter auto-resets
             if (newCount === 1) {
                 await redisClient.expire(key, config.windowMs / 1000);
             }
+            
+            // If increment pushed us over the limit (races/concurrency), deny and return time until reset!
+            if (newCount > config.max) {
+                const ttl = await redisClient.ttl(key);
+                const safeTTL = Number.isFinite(ttl) && ttl > 0 ? ttl : config.windowMs / 1000;
+                return {
+                    allowed: false,
+                    remaining: 0,
+                    resetTime: Date.now() + (safeTTL * 1000)
+                };
+            }
+
+            // Within limit: report remaining quota and when the window actually expires (key TTL)
+            const ttl = await redisClient.ttl(key);
+            const safeTTL = Number.isFinite(ttl) && ttl > 0 ? ttl : config.windowMs / 1000;
 
             return {
                 allowed: true,
-                remaining: config.max - newCount,
-                resetTime: Date.now() + config.windowMs,
+                remaining: Math.max(0, config.max - newCount),
+                resetTime: Date.now() + (safeTTL * 1000),
             };
 
         } catch (error) {
@@ -74,7 +82,7 @@ export class UserRateLimiter {
         const monthlyKey = `token_budget:monthly:${userId}`;
 
         // budget limits
-        const dailyLimit = 1000000; // 50k tokens per day (~$1.00)
+        const dailyLimit = 50000; // 50k tokens per day (~$1.00)
         const monthlyLimit = 1000000; // 1M tokens per month (~$20.00)
 
         try {
@@ -84,7 +92,7 @@ export class UserRateLimiter {
                 redisClient.get(monthlyKey).then(val => parseInt(val || '0')),
             ]);
 
-            // check if adding tokens will exceed limits
+            // Pre-check against current usage: if this request would exceed daily budget, deny now
             if (dailyUsed + tokensToUse > dailyLimit) {
                 const ttl = await redisClient.ttl(dailyKey);
                 return {
@@ -94,6 +102,7 @@ export class UserRateLimiter {
                 };
             }
 
+            // Pre-check against current usage: if this request would exceed monthly budget, deny now
             if (monthlyUsed + tokensToUse > monthlyLimit) {
                 const ttl = await redisClient.ttl(monthlyKey);
                 return {
@@ -111,13 +120,55 @@ export class UserRateLimiter {
             pipeline.expire(monthlyKey, 30 * 24 * 60 * 60); // 30 days
             await pipeline.exec();
 
+            // Post-increment verification: read updated usage and TTLS
+            // Rationale: other concurrent requests may have incremented between our read and write!
+            const [newDailyStr, newMonthlyStr, dailyTTL, monthlyTTL] = await Promise.all([
+                redisClient.get(dailyKey),
+                redisClient.get(monthlyKey),
+                redisClient.ttl(dailyKey),
+                redisClient.ttl(monthlyKey),
+            ]);
+            const newDaily = parseInt(newDailyStr || '0');
+            const newMonthly = parseInt(newMonthlyStr || '0');
+            const safeDailyTTL = Number.isFinite(dailyTTL) && dailyTTL > 0 ? dailyTTL : 24 * 60 * 60;
+            const safeMonthlyTTL = Number.isFinite(monthlyTTL) && monthlyTTL > 0 ? monthlyTTL : 30 * 24 * 60 * 60;
+
+            if (newDaily > dailyLimit || newMonthly > monthlyLimit) {
+                const rb = redisClient.pipeline();
+                if (newDaily > dailyLimit) rb.decrby(dailyKey, tokensToUse);
+                if (newMonthly > monthlyLimit) rb.decrby(monthlyKey, tokensToUse);
+                await rb.exec();
+
+                if (newDaily > dailyLimit && newMonthly > monthlyLimit) {
+                    const resetMs = Math.min(safeDailyTTL, safeMonthlyTTL) * 1000;
+                    return {
+                        allowed: false,
+                        remaining: 0,
+                        resetTime: Date.now() + resetMs,
+                    };
+                }
+                if (newDaily > dailyLimit) {
+                    return {
+                        allowed: false,
+                        remaining: Math.max(0, dailyLimit - (newDaily - tokensToUse)),
+                        resetTime: Date.now() + (safeDailyTTL * 1000)
+                    };
+                }
+                return {
+                    allowed: false,
+                    remaining: Math.max(0, monthlyLimit - (newMonthly - tokensToUse)),
+                    resetTime: Date.now() + (safeMonthlyTTL * 1000)
+                };
+            }
+
+            // Allowed: compute remaining from new values and use TTL-based resetTime
             return {
                 allowed: true,
                 remaining: Math.min(
-                    dailyLimit - (dailyUsed + tokensToUse),
-                    monthlyLimit - (monthlyUsed + tokensToUse)
+                    dailyLimit - newDaily,
+                    monthlyLimit - newMonthly
                 ),
-                resetTime: Date.now() + (24 * 60 * 60 * 1000)
+                resetTime: Date.now() + (safeDailyTTL * 1000)
             }
 
             
