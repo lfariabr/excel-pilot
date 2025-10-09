@@ -1,16 +1,6 @@
 import { redisClient } from '../redis';
-
-export const rateLimitConfig = {
-    openai: { windowMs: 60 * 1000, max: 10, }, // 10 requests per minute (window)
-    messages: { windowMs: 60 * 1000, max: 30,} // 30 requests per minute (window)
-};
-
-// Rate limit result interface
-interface RateLimitResult {
-    allowed: boolean;
-    remaining: number;
-    resetTime: number;
-}
+import { rateLimitConfig } from '../config/rateLimit.config';
+import { RateLimitResult } from '../schemas/types/rateLimitTypes';
 
 export class UserRateLimiter {
     /**
@@ -20,38 +10,49 @@ export class UserRateLimiter {
      */
 
     async checkUserLimit(userId: string, limitType: 'openai' | 'messages'): Promise<RateLimitResult> {
+        // Lua script: atomic INCR + conditional EXPIRE
+        // Guarantees TTL is set even on race conditions (count === 1 or crash before EXPIRE)
+        // TTL fallback: ensures consistent resetTime even if Redis TTL was missing or 0
         const key = `rateLimit:${userId}:${limitType}`;
         const config = rateLimitConfig[limitType];
+        console.log(key, config);
         
         try {
-            // get current count
-            const currentCount = await redisClient.get(key);
-            const count = currentCount ? parseInt(currentCount) : 0;
+            const script = `
+            local count = redis.call('INCR', KEYS[1])
+            if count == 1 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+            end
 
-            // check if limit is exceeded
-            if (count >= config.max) {
-                const ttl = await redisClient.ttl(key);
-                // TTL tells us how many seconds are left, when the window resets
+            local ttl = redis.call('TTL', KEYS[1])
+            if ttl == -1 then
+                redis.call('EXPIRE', KEYS[1], ARGV[1])
+                ttl = tonumber(ARGV[1])
+            end
+            
+            return {count, ttl}
+            `;
+            const [newCount, ttl] = await redisClient.eval(
+                script,
+                1,
+                key,
+                Math.floor(config.windowMs / 1000)
+            ) as [number, number];
+
+            if (newCount > config.max) {
+                const safeTTL = Number.isFinite(ttl) && ttl > 0 ? ttl : Math.floor(config.windowMs / 1000);
                 return {
                     allowed: false,
                     remaining: 0,
-                    resetTime: Date.now() + (ttl * 1000)
+                    resetTime: Date.now() + (safeTTL * 1000)
                 };
             }
 
-            //  Increment counter (creates if doesn't exist)
-            // INCR is atomic - no race conditions!!!
-            const newCount = await redisClient.incr(key);
-            
-            // set expiration on the first request
-            if (newCount === 1) {
-                await redisClient.expire(key, config.windowMs / 1000);
-            }
-
+            const safeTTL = Number.isFinite(ttl) && ttl > 0 ? ttl : Math.floor(config.windowMs / 1000);
             return {
                 allowed: true,
-                remaining: config.max - newCount,
-                resetTime: Date.now() + config.windowMs,
+                remaining: Math.max(0, config.max - newCount),
+                resetTime: Date.now() + (safeTTL * 1000),
             };
 
         } catch (error) {
@@ -70,57 +71,109 @@ export class UserRateLimiter {
      * @param tokensToUse - estimated or actual tokens to consume
      */
     async checkUserTokenBudget(userId: string, tokensToUse: number): Promise<RateLimitResult> {
+        // Lua script: atomic INCRBY + TTL repair + rollback if over daily/monthly limits
+        // Eliminates race conditions and TOCTOU problems by executing logic server-side
         const dailyKey = `token_budget:daily:${userId}`;
         const monthlyKey = `token_budget:monthly:${userId}`;
 
         // budget limits
-        const dailyLimit = 1000000; // 50k tokens per day (~$1.00)
+        const dailyLimit = 50000; // 50k tokens per day (~$1.00)
         const monthlyLimit = 1000000; // 1M tokens per month (~$20.00)
 
         try {
-            // get current usage
-            const [dailyUsed, monthlyUsed] = await Promise.all([
-                redisClient.get(dailyKey).then(val => parseInt(val || '0')),
-                redisClient.get(monthlyKey).then(val => parseInt(val || '0')),
-            ]);
+            // Rollback logic: if either limit is exceeded, reverts token usage immediately
+            // TTL repair after rollback: ensures key won't become zombie (no expiration)
+            // Remaining is computed using post-decrement values to reflect accurate state
+            const script = `
+            local dailyKey = KEYS[1]
+            local monthlyKey = KEYS[2]
+            local tokens = tonumber(ARGV[1])
+            local dailyLimit = tonumber(ARGV[2])
+            local monthlyLimit = tonumber(ARGV[3])
+            local dailyTTLSeconds = tonumber(ARGV[4])
+            local monthlyTTLSeconds = tonumber(ARGV[5])
 
-            // check if adding tokens will exceed limits
-            if (dailyUsed + tokensToUse > dailyLimit) {
-                const ttl = await redisClient.ttl(dailyKey);
+            -- increment both counters
+            local daily = redis.call('INCRBY', dailyKey, tokens)
+            local monthly = redis.call('INCRBY', monthlyKey, tokens)
+
+            -- ensure TTLs exist or repair missing TTLs
+            local dttl = redis.call('TTL', dailyKey)
+            if dttl == -1 then
+                redis.call('EXPIRE', dailyKey, dailyTTLSeconds)
+                dttl = dailyTTLSeconds
+            end
+            
+            local mttl = redis.call('TTL', monthlyKey)
+            if mttl == -1 then
+                redis.call('EXPIRE', monthlyKey, monthlyTTLSeconds)
+                mttl = monthlyTTLSeconds
+            end
+
+            -- check limits
+            local exceededDaily = (daily > dailyLimit)
+            local exceededMonthly = (monthly > monthlyLimit)
+            if exceededDaily or exceededMonthly then
+                -- rollback both counters atomically within the script
+                redis.call('DECRBY', dailyKey, tokens)
+                redis.call('DECRBY', monthlyKey, tokens)
+                -- read post-rollback values
+                local dval = tonumber(redis.call('GET', dailyKey) or '0')
+                local mval = tonumber(redis.call('GET', monthlyKey) or '0')
+                -- ensure TTLs after rollback
+                dttl = redis.call('TTL', dailyKey)
+            if dttl == -1 then
+                redis.call('EXPIRE', dailyKey, dailyTTLSeconds)
+                dttl = dailyTTLSeconds
+            end
+
+            mttl = redis.call('TTL', monthlyKey)
+            if mttl == -1 then
+                redis.call('EXPIRE', monthlyKey, monthlyTTLSeconds)
+                mttl = monthlyTTLSeconds
+            end
+
+            return {0, dval, mval, dttl, mttl}
+            end
+
+            return {1, daily, monthly, dttl, mttl}
+            `;
+
+            const [allowedNum, newDaily, newMonthly, dailyTTL, monthlyTTL] = await redisClient.eval(
+                script,
+                2,
+                dailyKey,
+                monthlyKey,
+                tokensToUse,
+                dailyLimit,
+                monthlyLimit,
+                24 * 60 * 60,
+                30 * 24 * 60 * 60
+            ) as [number, number, number, number, number];
+
+            const safeDailyTTL = Number.isFinite(dailyTTL) && dailyTTL > 0 ? dailyTTL : 24 * 60 * 60;
+            const safeMonthlyTTL = Number.isFinite(monthlyTTL) && monthlyTTL > 0 ? monthlyTTL : 30 * 24 * 60 * 60;
+
+            if (!allowedNum) {
                 return {
                     allowed: false,
-                    remaining: Math.max(0, dailyLimit - dailyUsed),
-                    resetTime: Date.now() + (ttl * 1000)
+                    remaining: Math.min(
+                        Math.max(0, dailyLimit - newDaily),
+                        Math.max(0, monthlyLimit - newMonthly)
+                    ),
+                    resetTime: Date.now() + (Math.min(safeDailyTTL, safeMonthlyTTL) * 1000)
                 };
             }
-
-            if (monthlyUsed + tokensToUse > monthlyLimit) {
-                const ttl = await redisClient.ttl(monthlyKey);
-                return {
-                    allowed: false,
-                    remaining: Math.max(0, monthlyLimit - monthlyUsed),
-                    resetTime: Date.now() + (ttl * 1000)
-                };
-            }
-
-            // update token usage
-            const pipeline = redisClient.pipeline();
-            pipeline.incrby(dailyKey, tokensToUse);
-            pipeline.expire(dailyKey, 24 * 60 * 60); // 1 day
-            pipeline.incrby(monthlyKey, tokensToUse);
-            pipeline.expire(monthlyKey, 30 * 24 * 60 * 60); // 30 days
-            await pipeline.exec();
 
             return {
                 allowed: true,
                 remaining: Math.min(
-                    dailyLimit - (dailyUsed + tokensToUse),
-                    monthlyLimit - (monthlyUsed + tokensToUse)
+                    Math.max(0, dailyLimit - newDaily),
+                    Math.max(0, monthlyLimit - newMonthly)
                 ),
-                resetTime: Date.now() + (24 * 60 * 60 * 1000)
+                resetTime: Date.now() + (Math.min(safeDailyTTL, safeMonthlyTTL) * 1000)
             }
 
-            
         } catch (error) {
             console.error('Token budget error:', error);
             // Fail open
