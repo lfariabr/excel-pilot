@@ -5,9 +5,10 @@ import Conversation from "../../models/Conversation";
 import { formatTimestamp } from "../../utils/dateFormatter";
 import { TokenEstimator } from "../../utils/tokenEstimator";
 import { getSystemPrompt, askOpenAI } from "../../services/openAi";
-import { userRateLimiter, rateLimitConfig } from "../../middleware/rateLimiter";
+import { userRateLimiter } from "../../middleware/rateLimiter";
 import { generateConversationTitle, updateConversationTitle } from "../../services/titleGenerator";
 import { generateConversationSummary, updateConversationSummary } from "../../services/summaryGenerator";
+import { rateLimitConfig } from "../../config/rateLimit.config";
 
 export const conversationsMutation = {
     startConversation: async (_: any, { content }: { content: string }, ctx: any) => {
