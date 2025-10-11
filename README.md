@@ -14,6 +14,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | OpenAI | ✅ | _v0.0.7_ |
 | Redis | ✅ | _v0.0.8_ |
 | OpenAI Core | ✅ | _v0.0.9_ |
+| Jest + Testing | 🏗️🧱🔨 | _v0.0.10_ |
 | Docker | 🏗️🧱🔨 | TBD |
 | Winston | 🏗️🧱🔨 | TBD |
 
@@ -31,7 +32,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.9** - OpenAI Core (Responses API, Cursor Pagination, Auto Title and Summary)
 
 ### **WORK IN PROGRESS**:
-- tbd
+- **v0.0.10** - Jest + Testing: Unit tests, Integration tests, E2E tests
 
 ### **BACKLOG**:
 
@@ -51,11 +52,6 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - Performance metrics
     - Error tracking
     - Rate limit events
-
-- **tbd** - Jest + Testing
-    - Unit tests
-    - Integration tests
-    - E2E tests
 
 - **tbd** - Study Jenkins + GitHub Actions
 
