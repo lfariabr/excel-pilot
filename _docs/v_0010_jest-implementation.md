@@ -33,7 +33,7 @@ Your [rateLimiter.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPil
 
 ## 3. **File Structure Created**
 
-```
+```text
 src/__tests__/
 ├── __mocks__/
 │   └── redisMock.ts          # Fake Redis that mimics real behavior
@@ -296,7 +296,7 @@ const config: Config = {
 
 ## 10. **The Complete Testing Flow**
 
-```
+```text
 npm test
     ↓
 Jest starts
