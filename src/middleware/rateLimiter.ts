@@ -15,7 +15,6 @@ export class UserRateLimiter {
         // TTL fallback: ensures consistent resetTime even if Redis TTL was missing or 0
         const key = `rateLimit:${userId}:${limitType}`;
         const config = rateLimitConfig[limitType];
-        console.log(key, config);
         
         try {
             const script = `
