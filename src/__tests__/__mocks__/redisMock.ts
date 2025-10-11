@@ -8,23 +8,36 @@ export function resetStore() {
   store.clear();
 }
 
-function getTTL(key: string) {
+function getEntry(key: string) {
   const entry = store.get(key);
-  if (!entry || !entry.expireAt) return -1;
-  const ttl = entry.expireAt - nowSec();
-  return ttl > 0 ? ttl : -2; // -2 if expired
+  if (!entry) return undefined;
+  if (entry.expireAt && entry.expireAt <= nowSec()) {
+    store.delete(key);
+    return undefined;
+  }
+  return entry;
 }
 
 function ensureKey(key: string) {
-  if (!store.has(key)) store.set(key, { count: 0 });
-  return store.get(key)!;
+  const existing = getEntry(key);
+  if (existing) return existing;
+  const fresh: { count: number; expireAt?: number } = { count: 0 };
+  store.set(key, fresh);
+  return fresh;
+}
+
+function getTTL(key: string) {
+  const entry = getEntry(key);
+  if (!entry) return -2;
+  if (!entry.expireAt) return -1;
+  return entry.expireAt - nowSec();
 }
 
 export function makeRedisMock() {
   return {
     // Minimal methods used elsewhere (if any tests call them)
     get: async (key: string) => {
-      const entry = store.get(key);
+      const entry = getEntry(key);
       return entry ? String(entry.count) : null;
     },
     ttl: async (key: string) => getTTL(key),
