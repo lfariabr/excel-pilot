@@ -1,7 +1,7 @@
 import { makeRedisMock, resetStore } from '../__mocks__/redisMock';
 
 // Mock src/redis to inject our in-memory Redis
-jest.mock('../../redis', () => {
+jest.mock('../../redis/redis', () => {
   const mock = require('../__mocks__/redisMock');
   return {
     redisClient: mock.makeRedisMock(),
