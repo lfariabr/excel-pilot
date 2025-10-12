@@ -1,6 +1,6 @@
 import { makeRedisMock, resetStore } from '../__mocks__/redisMock';
 
-jest.mock('../../redis', () => {
+jest.mock('../../redis/redis', () => {
   const mock = require('../__mocks__/redisMock');
   return {
     redisClient: mock.makeRedisMock(),

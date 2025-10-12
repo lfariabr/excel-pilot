@@ -1,4 +1,4 @@
-import redisClient from "../redis";
+import redisClient from "../redis/redis";
 
 // npx ts-node src/tests/test-redis.ts
 

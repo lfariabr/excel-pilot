@@ -9,7 +9,7 @@ import { createApp } from "./app";
 import { attachGraphQL } from "./graphql";
 
 // Redis
-import { redisClient, connectRedis } from "./redis";
+import { redisClient, connectRedis } from "./redis/redis";
 
 async function start() {
     await mongoose.connect(process.env.MONGO_URI!);
