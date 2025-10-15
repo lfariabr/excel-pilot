@@ -8,12 +8,14 @@ jest.mock('../../redis/redis', () => {
 });
 
 import { userRateLimiter } from '../../middleware/rateLimiter';
+import { redisClient } from '../../redis/redis';
 
 describe('checkUserTokenBudget()', () => {
   const userId = 'budget-user';
 
   beforeEach(() => {
     resetStore();
+    jest.restoreAllMocks();
   });
 
   test('allows within both daily and monthly limits', async () => {
@@ -58,5 +60,82 @@ describe('checkUserTokenBudget()', () => {
     // After rollback, should be back at 49k
     const r4 = await userRateLimiter.checkUserTokenBudget('inc1', 1000);
     expect(r4.allowed).toBe(true); // 49k + 1k = 50k exactly (allowed)
+  });
+
+  describe('diagnostic flags', () => {
+    const dailyLimit = 50000;
+    const monthlyLimit = 1000000;
+    const dailyTTL = 3600; // 1h
+    const monthlyTTL = 7200; // 2h
+
+    test('daily-only exceeded', async () => {
+      const tokensToUse = 100;
+      const newDaily = dailyLimit - 10; // post-rollback value from Lua
+      const newMonthly = monthlyLimit - 1000; // far from monthly limit
+      jest.spyOn(redisClient as any, 'eval').mockResolvedValueOnce([
+        0, newDaily, newMonthly, dailyTTL, monthlyTTL
+      ]);
+
+      const res = await userRateLimiter.checkUserTokenBudget('diag1', tokensToUse);
+      expect(res.allowed).toBe(false);
+      expect(res.exceededDaily).toBe(true);
+      expect(res.exceededMonthly).toBe(false);
+      expect(res.source).toBe('daily');
+      expect(res.remaining).toBe(Math.min(dailyLimit - newDaily, monthlyLimit - newMonthly));
+      expect(res.resetTime).toBeGreaterThan(Date.now());
+    });
+
+    test('monthly-only exceeded', async () => {
+      const tokensToUse = 100;
+      const newDaily = 200; // low daily usage
+      const newMonthly = monthlyLimit - 50; // near monthly limit
+      jest.spyOn(redisClient as any, 'eval').mockResolvedValueOnce([
+        0, newDaily, newMonthly, dailyTTL, monthlyTTL
+      ]);
+
+      const res = await userRateLimiter.checkUserTokenBudget('diag2', tokensToUse);
+      expect(res.allowed).toBe(false);
+      expect(res.exceededDaily).toBe(false);
+      expect(res.exceededMonthly).toBe(true);
+      expect(res.source).toBe('monthly');
+      expect(res.remaining).toBe(Math.min(dailyLimit - newDaily, monthlyLimit - newMonthly));
+      expect(res.resetTime).toBeGreaterThan(Date.now());
+    });
+
+    test('both exceeded', async () => {
+      const tokensToUse = 100;
+      const newDaily = dailyLimit - 10;
+      const newMonthly = monthlyLimit - 50;
+      jest.spyOn(redisClient as any, 'eval').mockResolvedValueOnce([
+        0, newDaily, newMonthly, dailyTTL, monthlyTTL
+      ]);
+
+      const res = await userRateLimiter.checkUserTokenBudget('diag3', tokensToUse);
+      expect(res.allowed).toBe(false);
+      expect(res.exceededDaily).toBe(true);
+      expect(res.exceededMonthly).toBe(true);
+      expect(res.source).toBe('both');
+      expect(res.remaining).toBe(Math.min(dailyLimit - newDaily, monthlyLimit - newMonthly));
+      expect(res.resetTime).toBeGreaterThan(Date.now());
+    });
+
+    test('edge-case equals limit (allowed)', async () => {
+      const tokensToUse = 100;
+      // Simulate success path from Lua: allowed=1 and counters include tokens
+      const afterDaily = dailyLimit; // exactly hits daily limit
+      const afterMonthly = 1000; // far from monthly limit
+      jest.spyOn(redisClient as any, 'eval').mockResolvedValueOnce([
+        1, afterDaily, afterMonthly, dailyTTL, monthlyTTL
+      ]);
+
+      const res = await userRateLimiter.checkUserTokenBudget('diag4', tokensToUse);
+      expect(res.allowed).toBe(true);
+      expect(res.remaining).toBe(Math.min(dailyLimit - afterDaily, monthlyLimit - afterMonthly));
+      expect(res.resetTime).toBeGreaterThan(Date.now());
+      // No exceeded flags on success path
+      expect(res.exceededDaily).toBeUndefined();
+      expect(res.exceededMonthly).toBeUndefined();
+      expect(res.source).toBeUndefined();
+    });
   });
 });
