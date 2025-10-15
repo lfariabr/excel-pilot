@@ -91,13 +91,29 @@ export class UserRateLimiter {
             const safeMonthlyTTL = Number.isFinite(monthlyTTL) && monthlyTTL > 0 ? monthlyTTL : 30 * 24 * 60 * 60;
 
             if (!allowedNum) {
+                const attemptedDaily = newDaily + tokensToUse;
+                const attemptedMonthly = newMonthly + tokensToUse;
+                const exceededDaily = attemptedDaily > dailyLimit;
+                const exceededMonthly = attemptedMonthly > monthlyLimit;
+
+                const source = exceededDaily && exceededMonthly
+                ? 'both'
+                : exceededDaily
+                ? 'daily'
+                : exceededMonthly
+                ? 'monthly'
+                : 'none';
+
                 return {
                     allowed: false,
                     remaining: Math.min(
                         Math.max(0, dailyLimit - newDaily),
                         Math.max(0, monthlyLimit - newMonthly)
                     ),
-                    resetTime: Date.now() + (Math.min(safeDailyTTL, safeMonthlyTTL) * 1000)
+                    resetTime: Date.now() + (Math.min(safeDailyTTL, safeMonthlyTTL) * 1000),
+                    exceededDaily,
+                    exceededMonthly,
+                    source
                 };
             }
 
