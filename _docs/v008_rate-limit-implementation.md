@@ -21,24 +21,28 @@ User Request → Rate Limiter → Your GraphQL → OpenAI API
 ## 📁 **Files You'll Create (Step by Step)**
 
 ### **Step 1: Redis Connection** 
-**File:** [src/config/redis.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/config/redis.ts:0:0-0:0)
-**Purpose:** Connect to Redis database
-**What you'll learn:** How to configure Redis client, handle connection events
+
+- **File:** [src/config/redis.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/config/redis.ts:0:0-0:0)
+- **Purpose:** Connect to Redis database
+- **What you'll learn:** How to configure Redis client, handle connection events
 
 ### **Step 2: Rate Limiting Logic**
-**File:** [src/middleware/rateLimiter.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/middleware/rateLimiter.ts:0:0-0:0) 
-**Purpose:** Core rate limiting logic
-**What you'll learn:** How to track user requests, implement sliding windows, token budgets
+
+- **File:** [src/middleware/rateLimiter.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/middleware/rateLimiter.ts:0:0-0:0) 
+- **Purpose:** Core rate limiting logic
+- **What you'll learn:** How to track user requests, implement sliding windows, token budgets
 
 ### **Step 3: Integration**
-**File:** Update [src/resolvers/conversations/mutations.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/resolvers/conversations/mutations.ts:0:0-0:0)
-**Purpose:** Apply rate limiting to sendMessage
-**What you'll learn:** How to integrate middleware into GraphQL resolvers
+
+- **File:** Update [src/resolvers/conversations/mutations.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/resolvers/conversations/mutations.ts:0:0-0:0)
+- **Purpose:** Apply rate limiting to sendMessage
+- **What you'll learn:** How to integrate middleware into GraphQL resolvers
 
 ### **Step 4: Environment Config**
-**File:** Update [.env](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/.env:0:0-0:0)
-**Purpose:** Redis connection settings
-**What you'll learn:** Environment-based configuration
+
+- **File:** Update [.env](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/.env:0:0-0:0)
+- **Purpose:** Redis connection settings
+- **What you'll learn:** Environment-based configuration
 
 ## 🧠 **Key Concepts You'll Master**
 
