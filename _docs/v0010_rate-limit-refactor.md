@@ -9,7 +9,7 @@ Based on recent works separating Conversations and Messages, here's a strategic 
 - ✅ Separate configs for `openai`, `messages`, `conversations`
 - ✅ Token budget tracking (daily: 50K, monthly: 1M)
 - ✅ Two distinct models: `Conversation` (thread container) and `Message` (individual turns)
-- ✅ Rate limiting on [sendMessage](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/resolvers/messages/mutations.ts:12:4-132:5) and [startConversation](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/resolvers/conversations/mutations.ts:12:4-101:5)
+- ✅ Rate limiting on [sendMessage](/excelPilot/src/resolvers/messages/mutations.ts:12:4-132:5) and [startConversation](/excelPilot/src/resolvers/conversations/mutations.ts:12:4-101:5)
 
 **Current gaps:**
 ```typescript
@@ -22,7 +22,7 @@ Based on recent works separating Conversations and Messages, here's a strategic 
 ## 🚀 Proposed Improvements (Priority Order)
 
 ### **1. Add Conversation-Specific Rate Limiting** ⭐⭐⭐
-**Why:** You configured it but never implemented it. Prevents spam conversation creation.
+**Why:** It has been configured, but never implemented it. Prevents spam conversation creation.
 
 ```typescript
 // In rateLimiter.ts
@@ -33,7 +33,7 @@ async checkUserLimit(
 ```
 
 **Apply to:**
-- [startConversation](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/resolvers/conversations/mutations.ts:12:4-101:5) mutation (conversation creation protection)
+- [startConversation](/excelPilot/src/resolvers/conversations/mutations.ts:12:4-101:5) mutation (conversation creation protection)
 - Any future "list conversations" query (pagination abuse protection)
 
 ---
@@ -66,7 +66,7 @@ const messageLimitResult = await userRateLimiter.checkUserLimit(
 ---
 
 ### **3. Add Tiered/Role-Based Rate Limiting** ⭐⭐
-**Why:** From your manifesto: "align features with monetization strategy"
+**Why:** So we align feature with monetization strategy
 
 ```typescript
 // rateLimit.config.ts
@@ -206,25 +206,26 @@ if (ctx.user.role === 'admin' || process.env.BYPASS_RATE_LIMITS === 'true') {
 
 ```typescript
 // v0.0.10 Deliverables
-☑️ Split Conversations/Messages (DONE by you!)
-⏳ Add 'conversations' to checkUserLimit type union
-⏳ Apply conversation rate limit to startConversation
-⏳ Apply message rate limit to sendMessage  
+✅ Split Conversations/Messages (DONE by you!)
+✅ Add 'conversations' to checkUserLimit type union
+✅ Apply conversation rate limit to startConversation
+✅ Apply message rate limit to sendMessage  
 ⏳ Create tiered rate limit configuration
 ⏳ Add userTier parameter to rate limiter methods
 ⏳ Implement RateLimitAnalytics class
 ⏳ Add circuit breaker for Redis failures
-⏳ Improve error messages with upgrade CTAs
+✅ Improve error messages with upgrade CTAs
 ⏳ Add admin bypass capability
 ⏳ Update tests for new conversation limits
 ⏳ Update tests for tiered limits
+
 ```
 
 ---
 
 ## 🎯 Quick Win Implementation Order
 
-1. **Phase 1 (30 min):** Add `'conversations'` type support + apply to [startConversation](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/resolvers/conversations/mutations.ts:12:4-101:5)
+1. **Phase 1 (30 min):** Add `'conversations'` type support + apply to [startConversation](/excelPilot/src/resolvers/conversations/mutations.ts:12:4-101:5)
 2. **Phase 2 (45 min):** Separate `'messages'` vs `'openai'` limits in mutations
 3. **Phase 3 (1-2 hrs):** Implement tiered rate limiting with User model integration
 4. **Phase 4 (1 hr):** Add analytics and monitoring
@@ -232,35 +233,19 @@ if (ctx.user.role === 'admin' || process.env.BYPASS_RATE_LIMITS === 'true') {
 
 ---
 
-## 🤔 Questions for You
+## 🤔 Questions to Consider:
 
-1. **Do you want tiered limits now or in a future version?** (Affects User model - need to add `tier` or `plan` field)
+1. **Do we want tiered limits now or in a future version?** (Affects User model - need to add `tier` or `plan` field)
 2. **Should we track rate limit violations for analytics?** (Business intelligence opportunity)
-3. **Do you want different limits for conversation creation vs message sending?** (Recommended: yes)
+3. **Do we want different limits for conversation creation vs message sending?** (Recommended: yes)
 
-What would you like to tackle first? I recommend starting with **Phase 1** (conversation rate limiting) since you already have the config ready!
-
-### User Input
-
-explain me how the current TTL is working, is it a timed window? no risk of balooning?
-
-### Planner Response
-
-Let me examine the Lua scripts to explain exactly how the TTL mechanism works.
-
-*Searched filesystem*
-
-*Viewed [checkUserLimit.lua](file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/redis/scripts/checkUserLimit.lua) *
-
-*Viewed [tokenBudget.lua](file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/redis/scripts/tokenBudget.lua) *
-
-### Planner Response
+---
 
 # TTL Mechanism Explained
 
 ## 🔍 How It Works (Sliding Fixed Window)
 
-Your current implementation uses a **fixed window** approach with automatic TTL management. Here's the breakdown:
+The current implementation uses a **fixed window** approach with automatic TTL management. Here's the breakdown:
 
 ### **checkUserLimit.lua (Rate Limiting)**
 
@@ -303,7 +288,7 @@ end
 
 ### **1. Automatic Expiration (Redis EXPIRE)**
 ```lua
-redis.call('EXPIRE', KEYS[1], 60)  -- Key WILL be deleted after 60s
+redis.call('EXPIRE', KEYS[1], 60)  -- Key WILL be deleted after 60s!
 ```
 - Redis guarantees expiration
 - No manual cleanup needed
@@ -362,7 +347,7 @@ GET key → returns nil (data lost)
 ```
 
 **Mitigation:**
-- Your Lua script handles this via TTL repair
+- The Lua script handles this via TTL repair
 - Use Redis persistence (AOF or RDB snapshots)
 - Risk is **minimal** for rate limiting (not financial data)
 
@@ -401,7 +386,7 @@ Total for 1M users: 250MB
 
 ## 🔄 Comparison: Current vs Alternatives
 
-### **Your Current: Fixed Window**
+### **My Current: Fixed Window**
 ```
 ✅ Simple & predictable
 ✅ Low Redis CPU usage (1 INCR per request)
@@ -429,30 +414,13 @@ Total for 1M users: 250MB
 
 ## ✅ Conclusion
 
-**Your implementation is solid:**
+**Current implementation is solid:**
 1. ✅ **No ballooning risk** → Keys auto-expire via Redis EXPIRE
 2. ✅ **Orphan protection** → TTL repair logic prevents zombie keys
 3. ✅ **Memory efficient** → Fixed small footprint per user
 4. ✅ **Atomic operations** → Lua scripts prevent race conditions
-5. ⚠️ **Known limitation** → Fixed window allows boundary bursts (acceptable trade-off)
+5. ⚠️ **Known limitation** → Fixed window allows boundary bursts (assuming it's an acceptable trade-off)
 
-**Recommendation:** Keep the current approach. It's production-ready and follows industry best practices (same pattern used by GitHub, Stripe, AWS APIs).
-
-Would you like me to show you how to implement a **sliding window** or **token bucket** for comparison, or shall we proceed with the v0.0.10 improvements using the current solid foundation?
+**My Take:** Keep the current approach. It's production-ready and follows industry best practices (same pattern used by GitHub, Stripe, AWS APIs).
 
 ---
-
-# Implementation checklist
-// v0.0.10 Deliverables
-✅ Split Conversations/Messages (DONE by you!)
-✅ Add 'conversations' to checkUserLimit type union
-✅ Apply conversation rate limit to startConversation
-✅ Apply message rate limit to sendMessage  
-⏳ Create tiered rate limit configuration
-⏳ Add userTier parameter to rate limiter methods
-⏳ Implement RateLimitAnalytics class
-⏳ Add circuit breaker for Redis failures
-✅ Improve error messages with upgrade CTAs
-⏳ Add admin bypass capability
-⏳ Update tests for new conversation limits
-⏳ Update tests for tiered limits
