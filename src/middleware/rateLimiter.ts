@@ -14,7 +14,7 @@ export class UserRateLimiter {
      * @param limitType - type of limit (if openai or messages)
      */
 
-    async checkUserLimit(userId: string, limitType: 'openai' | 'messages'): Promise<RateLimitResult> {
+    async checkUserLimit(userId: string, limitType: 'openai' | 'messages' | 'conversations'): Promise<RateLimitResult> {
         const key = `rateLimit:${userId}:${limitType}`;
         const config = rateLimitConfig[limitType];
         

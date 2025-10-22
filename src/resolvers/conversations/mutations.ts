@@ -17,10 +17,14 @@ export const conversationsMutation = {
         }
 
         // Add after authentication, before calling askOpenAI:
-        const rateLimitResult = await userRateLimiter.checkUserLimit(ctx.user.sub, 'openai');
+        const rateLimitResult = await userRateLimiter.checkUserLimit(
+            ctx.user.sub, 
+            'conversations'
+        );
         if (!rateLimitResult.allowed) {
             throw new GraphQLError(
-                `Rate limit exceeded. You can make ${rateLimitConfig.openai.max} OpenAI requests per minute. Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
+                `Rate limit exceeded. You can make ${rateLimitConfig.conversations.max} conversations per minute. ` +
+                `Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
                 {
                     extensions: {
                         code: "RATE_LIMIT_EXCEEDED",
@@ -49,7 +53,10 @@ export const conversationsMutation = {
         
         // Update token budget
         const estimatedTokens = TokenEstimator.estimateTokens(content, []);
-        const budgetResult = await userRateLimiter.checkUserTokenBudget(ctx.user.sub, estimatedTokens);
+        const budgetResult = await userRateLimiter.checkUserTokenBudget(
+            ctx.user.sub, 
+            estimatedTokens
+        );
         if (!budgetResult.allowed) {
             throw new GraphQLError(
                 `Daily token budget exceeded. Remaining: ${budgetResult.remaining} tokens. Resets in ${Math.ceil((budgetResult.resetTime - Date.now()) / (1000 * 60 * 60))} hours.`,

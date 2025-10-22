@@ -18,10 +18,14 @@ export const messagesMutation = {
         }
 
         // v0.0.8 - Rate Limiting
-        const rateLimitResult = await userRateLimiter.checkUserLimit(ctx.user.sub, 'openai');
+        const rateLimitResult = await userRateLimiter.checkUserLimit(
+            ctx.user.sub, 
+            'messages'
+        );
         if (!rateLimitResult.allowed) {
             throw new GraphQLError(
-                `Rate limit exceeded. You can make ${rateLimitConfig.openai.max} OpenAI requests per minute. Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
+                `Rate limit exceeded. You can make ${rateLimitConfig.messages.max} messages per minute. ` +
+                `Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
             {
                 extensions: {
                     code: "RATE_LIMIT_EXCEEDED",
@@ -87,7 +91,10 @@ export const messagesMutation = {
 
         if (tokenDifference > 0) {
             // means we underestimated and need to add tokens
-            await userRateLimiter.checkUserTokenBudget(ctx.user.sub, tokenDifference);
+            await userRateLimiter.checkUserTokenBudget(
+                ctx.user.sub, 
+                tokenDifference
+            );
         }
 
         // persist assistant message
