@@ -18,6 +18,11 @@ describe('checkUserLimit()', () => {
 
   beforeEach(() => {
     resetStore();
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   test('allows under the limit and sets TTL', async () => {
@@ -40,8 +45,6 @@ describe('checkUserLimit()', () => {
   });
 
   test('repairs missing TTL (orphaned key)', async () => {
-    // One more call after we "remove" TTL in mock by simulating no TTL on next call.
-    // Our mock auto-repairs TTL inside eval; assert resetTime is valid.
     const res = await userRateLimiter.checkUserLimit('u2', limitType);
     expect(res.allowed).toBe(true);
     expect(res.resetTime).toBeGreaterThan(Date.now());
@@ -63,46 +66,62 @@ describe('checkUserLimit()', () => {
   });
 
   test('resets the limit after the time window', async () => {
-    // Consume up to the limit
-    for (let i = 0; i < max; i++) {
+    jest.useFakeTimers({ now: Date.now() });
+    try {
+      // Consume up to the limit
+      for (let i = 0; i < max; i++) {
+        const res = await userRateLimiter.checkUserLimit(userId, limitType);
+        expect(res.allowed).toBe(true);
+      }
+
+      // Simulate time passage for the window reset
+      jest.advanceTimersByTime(windowMs);
+
+      // After reset, the limit should allow requests again
       const res = await userRateLimiter.checkUserLimit(userId, limitType);
       expect(res.allowed).toBe(true);
+      expect(res.remaining).toBe(max - 1);
+    } finally {
+      jest.useRealTimers();
     }
-
-    // Simulate time passage for the window reset
-    jest.useFakeTimers();
-    jest.advanceTimersByTime(windowMs);
-
-    // After reset, the limit should allow requests again
-    const res = await userRateLimiter.checkUserLimit(userId, limitType);
-    expect(res.allowed).toBe(true);
-    expect(res.remaining).toBe(max - 1);
-    jest.useRealTimers();
   });
 
-    test('handles Redis failures gracefully', async () => {
-    const redisSpy = jest.spyOn(require('../../redis/redis').redisClient, 'get').mockImplementation(() => {
-      throw new Error('Redis connection failed');
-    });
-  
+  test('handles Redis failures gracefully', async () => {
+    const { redisClient } = require('../../redis/redis');
+    const evalSpy = jest
+      .spyOn(redisClient, 'eval')
+      .mockImplementation(() => {
+        throw new Error('Redis connection failed');
+      });
+
     const res = await userRateLimiter.checkUserLimit(userId, limitType);
-  
-    // Adjust expectation based on your fallback behavior
-    expect(res.allowed).toBe(true); 
-  
-    // Restore the original implementation
-    redisSpy.mockRestore();
+
+    expect(res.allowed).toBe(false);
+    expect(res.remaining).toBe(max); // Ensure the remaining is reset to the initial limit
+
+    evalSpy.mockRestore();
   });
 
   test('handles concurrent requests correctly', async () => {
     const requests = Array.from({ length: max }, () =>
-    userRateLimiter.checkUserLimit(userId, limitType)
+      userRateLimiter.checkUserLimit(userId, limitType),
     );
-    
+
     const results = await Promise.all(requests);
     const allowedRequests = results.filter((res) => res.allowed);
 
     expect(allowedRequests.length).toBe(max);
-    expect(results[max - 1].remaining).toBe(0);
+
+    // Assert remaining values decrease sequentially for allowed requests
+    for (let i = 0; i < max; i++) {
+      expect(results[i].remaining).toBe(max - (i + 1));
+    }
+
+    // Ensure no requests are allowed beyond the limit
+    const overLimitRequests = results.slice(max);
+    overLimitRequests.forEach((res) => {
+      expect(res.allowed).toBe(false);
+      expect(res.remaining).toBe(0);
+    });
   });
 });
