@@ -96,30 +96,33 @@ describe('checkUserLimit()', () => {
 
     const res = await userRateLimiter.checkUserLimit(userId, limitType);
 
+    // Fail-closed: deny request with no remaining capacity
     expect(res.allowed).toBe(false);
-    expect(res.remaining).toBe(max); // Ensure the remaining is reset to the initial limit
+    expect(res.remaining).toBe(0);
 
     evalSpy.mockRestore();
   });
 
   test('handles concurrent requests correctly', async () => {
-    const requests = Array.from({ length: max }, () =>
+    // Create more than max requests to test over-limit behavior
+    const totalRequests = max + 3;
+    const requests = Array.from({ length: totalRequests }, () =>
       userRateLimiter.checkUserLimit(userId, limitType),
     );
 
     const results = await Promise.all(requests);
     const allowedRequests = results.filter((res) => res.allowed);
 
+    // Exactly max requests should be allowed
     expect(allowedRequests.length).toBe(max);
 
-    // Assert remaining values decrease sequentially for allowed requests
-    for (let i = 0; i < max; i++) {
-      expect(results[i].remaining).toBe(max - (i + 1));
-    }
+    // Redis INCR is atomic and serializes concurrent requests
+    // The first max requests should be allowed, remaining 3 should be denied
+    const deniedRequests = results.filter((res) => !res.allowed);
+    expect(deniedRequests.length).toBe(3);
 
-    // Ensure no requests are allowed beyond the limit
-    const overLimitRequests = results.slice(max);
-    overLimitRequests.forEach((res) => {
+    // All denied requests should have remaining: 0
+    deniedRequests.forEach((res) => {
       expect(res.allowed).toBe(false);
       expect(res.remaining).toBe(0);
     });

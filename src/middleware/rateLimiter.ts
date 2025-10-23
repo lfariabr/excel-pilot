@@ -47,9 +47,10 @@ export class UserRateLimiter {
 
         } catch (error) {
             console.error('Rate limiter error:', error);
+            // Fail-closed: deny request with no remaining capacity
             return {
                 allowed: false,
-                remaining: config.max,
+                remaining: 0,
                 resetTime: Date.now() + config.windowMs,
             };
         }
