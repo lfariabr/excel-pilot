@@ -47,7 +47,14 @@ export class UserRateLimiter {
 
         } catch (error) {
             console.error('Rate limiter error:', error);
-            // Fail-closed: deny request with no remaining capacity
+            // FAIL-CLOSED STRATEGY: Deny requests when Redis is unavailable
+            // Rationale: Rate limiting is a SECURITY control that prevents abuse.
+            // When tracking fails, we deny to prevent unlimited requests that could:
+            // - Overwhelm downstream services (DDoS protection)
+            // - Bypass quota enforcement (spam/bot protection)
+            // - Compromise system stability
+            // Trade-off: Temporary service degradation during Redis outages,
+            // but maintains security posture and prevents cascading failures.
             return {
                 allowed: false,
                 remaining: 0,
@@ -129,7 +136,15 @@ export class UserRateLimiter {
 
         } catch (error) {
             console.error('Token budget error:', error);
-            // Fail open
+            // FAIL-OPEN STRATEGY: Allow requests when Redis is unavailable
+            // Rationale: Token budget is a COST CONTROL that tracks OpenAI API usage.
+            // When tracking fails, we allow to prioritize USER EXPERIENCE over cost.
+            // - Short Redis outages won't cause massive cost overruns (~minutes of untracked usage)
+            // - Users can continue working without disruption
+            // - Monitoring will alert on Redis failures via logs
+            // - Alternative: Fail-closed would block all AI features during infrastructure issues
+            // Trade-off: Potential minor cost overrun during outages,
+            // but maintains service availability and user trust.
             return {
                 allowed: true,
                 remaining: dailyLimit,
