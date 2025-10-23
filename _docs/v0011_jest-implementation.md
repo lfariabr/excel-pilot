@@ -6,7 +6,7 @@ I'll break this down into digestible sections, connecting Redis → Lua → Rate
 
 ## 1. **The Big Picture: What Are We Testing?**
 
-Your [rateLimiter.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/middleware/rateLimiter.ts:0:0-0:0) has two main functions that use **atomic Redis Lua scripts** to prevent race conditions:
+The [rateLimiter.ts](excelPilot/src/middleware/rateLimiter.ts:0:0-0:0) has two main functions that use **atomic Redis Lua scripts** to prevent race conditions:
 
 ### **checkUserLimit()** - Counts requests per time window
 - **Purpose**: Stop users from spamming (e.g., 30 messages/minute)
@@ -46,7 +46,7 @@ jest.config.ts                 # Jest configuration
 
 ---
 
-## 4. **Deep Dive: The Redis Mock ([redisMock.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:0:0-0:0))**
+## 4. **Deep Dive: The Redis Mock ([redisMock.ts](excelPilot/src/__tests__/__mocks__/redisMock.ts:0:0-0:0))**
 
 ### **What It Does**
 Simulates Redis operations using a JavaScript `Map`:
@@ -186,11 +186,11 @@ jest.mock('../../redis', () => {
 ```
 
 **What this does:**
-1. **Intercepts** all imports of [src/redis.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/redis.ts:0:0-0:0)
+1. **Intercepts** all imports of [src/redis.ts](excelPilot/src/redis.ts:0:0-0:0)
 2. **Replaces** real `redisClient` with your fake one
 3. **Before** any test code runs
 
-**Result**: When [rateLimiter.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/middleware/rateLimiter.ts:0:0-0:0) does `import { redisClient } from '../redis'`, it gets the mock instead of real Redis!
+**Result**: When [rateLimiter.ts](excelPilot/src/middleware/rateLimiter.ts:0:0-0:0) does `import { redisClient } from '../redis'`, it gets the mock instead of real Redis!
 
 ---
 
@@ -262,7 +262,7 @@ test('allows incremental usage up to limit, then denies and rolls back', async (
 
 ---
 
-## 9. **Jest Configuration ([jest.config.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/jest.config.ts:0:0-0:0))**
+## 9. **Jest Configuration ([jest.config.ts](excelPilot/jest.config.ts:0:0-0:0))**
 
 ```typescript
 const config: Config = {
@@ -290,7 +290,7 @@ const config: Config = {
 };
 ```
 
-**Key setting**: `testPathIgnorePatterns` prevents Jest from trying to run [redisMock.ts](cci:7://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:0:0-0:0) as a test suite (which caused the "must contain at least one test" error earlier).
+**Key setting**: `testPathIgnorePatterns` prevents Jest from trying to run [redisMock.ts](excelPilot/src/__tests__/__mocks__/redisMock.ts:0:0-0:0) as a test suite (which caused the "must contain at least one test" error earlier).
 
 ---
 

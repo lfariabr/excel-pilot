@@ -48,4 +48,61 @@ describe('checkUserLimit()', () => {
     const approxWindow = windowMs;
     expect(res.resetTime - Date.now()).toBeLessThanOrEqual(approxWindow);
   });
+
+  test('allows exactly at the limit but denies the next request', async () => {
+    // Consume up to the limit
+    for (let i = 0; i < max; i++) {
+      const res = await userRateLimiter.checkUserLimit(userId, limitType);
+      expect(res.allowed).toBe(true);
+    }
+
+    // Next request should be denied!
+    const res = await userRateLimiter.checkUserLimit(userId, limitType);
+    expect(res.allowed).toBe(false);
+    expect(res.remaining).toBe(0);
+  });
+
+  test('resets the limit after the time window', async () => {
+    // Consume up to the limit
+    for (let i = 0; i < max; i++) {
+      const res = await userRateLimiter.checkUserLimit(userId, limitType);
+      expect(res.allowed).toBe(true);
+    }
+
+    // Simulate time passage for the window reset
+    jest.useFakeTimers();
+    jest.advanceTimersByTime(windowMs);
+
+    // After reset, the limit should allow requests again
+    const res = await userRateLimiter.checkUserLimit(userId, limitType);
+    expect(res.allowed).toBe(true);
+    expect(res.remaining).toBe(max - 1);
+    jest.useRealTimers();
+  });
+
+    test('handles Redis failures gracefully', async () => {
+    const redisSpy = jest.spyOn(require('../../redis/redis').redisClient, 'get').mockImplementation(() => {
+      throw new Error('Redis connection failed');
+    });
+  
+    const res = await userRateLimiter.checkUserLimit(userId, limitType);
+  
+    // Adjust expectation based on your fallback behavior
+    expect(res.allowed).toBe(true); 
+  
+    // Restore the original implementation
+    redisSpy.mockRestore();
+  });
+
+  test('handles concurrent requests correctly', async () => {
+    const requests = Array.from({ length: max }, () =>
+    userRateLimiter.checkUserLimit(userId, limitType)
+    );
+    
+    const results = await Promise.all(requests);
+    const allowedRequests = results.filter((res) => res.allowed);
+
+    expect(allowedRequests.length).toBe(max);
+    expect(results[max - 1].remaining).toBe(0);
+  });
 });
