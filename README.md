@@ -2,6 +2,8 @@
 
 Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, Express.js, Apollo Server, MongoDB, Redis and OpenAI.
 
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/lfariabr/excel-pilot)
+
 ## Tech Stack & Version Control:
 | Tech | Status | Version |
 | --- | --- | --- |

@@ -62,6 +62,65 @@ describe('checkUserTokenBudget()', () => {
     expect(r4.allowed).toBe(true); // 49k + 1k = 50k exactly (allowed)
   });
 
+  test('handles Redis failures gracefully with fail-open', async () => {
+    const evalSpy = jest
+      .spyOn(redisClient, 'eval')
+      .mockImplementation(() => {
+        throw new Error('Redis failure');
+      });
+
+    const res = await userRateLimiter.checkUserTokenBudget(userId, 5000);
+
+    // Fail-open: allow request during Redis outage to preserve UX
+    expect(res.allowed).toBe(true);
+    expect(res.remaining).toBe(50000); // dailyLimit default
+    expect(res.resetTime).toBeGreaterThan(Date.now());
+    
+    // No diagnostic flags on error path
+    expect(res.exceededDaily).toBeUndefined();
+    expect(res.exceededMonthly).toBeUndefined();
+
+    evalSpy.mockRestore();
+  });
+
+  test('handles concurrent token budget requests correctly', async () => {
+    const dailyLimit = 50000;
+    const tokensPerRequest = 5000;
+    const maxAllowed = Math.floor(dailyLimit / tokensPerRequest); // 10 requests
+    const totalRequests = maxAllowed + 3; // 13 total: 10 allowed, 3 denied
+
+    // Fire concurrent requests to test Lua script atomicity
+    // Without atomic operations, race conditions could allow > dailyLimit consumption
+    const requests = Array.from({ length: totalRequests }, () =>
+      userRateLimiter.checkUserTokenBudget('concurrent-user', tokensPerRequest),
+    );
+
+    const results = await Promise.all(requests);
+    const allowedRequests = results.filter((res) => res.allowed);
+    const deniedRequests = results.filter((res) => !res.allowed);
+
+    // CRITICAL: Exactly 10 requests should be allowed (10 × 5000 = 50k)
+    // Redis Lua script ensures atomic INCRBY prevents race conditions
+    expect(allowedRequests.length).toBe(maxAllowed);
+    expect(deniedRequests.length).toBe(3);
+
+    // Verify denied requests have diagnostic flags
+    deniedRequests.forEach((res) => {
+      expect(res.allowed).toBe(false);
+      // Remaining should be less than tokens requested (not enough budget left)
+      expect(res.remaining).toBeLessThan(tokensPerRequest);
+      // Should have exceeded daily limit
+      expect(res.exceededDaily).toBe(true);
+      // Source should indicate which limit was hit
+      expect(res.source).toBeTruthy();
+      expect(['daily', 'monthly', 'both']).toContain(res.source);
+    });
+
+    // Verify at least one allowed request shows decreasing remaining budget
+    const allowedWithRemaining = allowedRequests.filter((res) => res.remaining < dailyLimit);
+    expect(allowedWithRemaining.length).toBeGreaterThan(0);
+  });
+
   describe('diagnostic flags', () => {
     const dailyLimit = 50000;
     const monthlyLimit = 1000000;
