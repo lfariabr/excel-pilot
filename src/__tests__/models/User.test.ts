@@ -2,7 +2,7 @@
 
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import UserModel from '../../../src/models/User';
+import UserModel from '../../models/User';
 
 describe('User Model', () => {
   let mongoServer: MongoMemoryServer;
@@ -35,6 +35,7 @@ describe('User Model', () => {
     // Retrieve with password field
     const savedUser = await UserModel.findById(user._id).select('+password');
     
+    expect(savedUser).not.toBeNull();
     expect(savedUser?.password).not.toBe(plainPassword);
     expect(savedUser?.password).toMatch(/^\$2b\$/); // bcrypt format
   });
