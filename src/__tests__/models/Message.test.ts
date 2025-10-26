@@ -78,11 +78,9 @@ describe('Message Model', () => {
       systemPrompt: 'Test'
     });
 
-    await Message.create([
-      { conversationId: conversation._id, userId: testUserId, role: 'user', content: 'First' },
-      { conversationId: conversation._id, userId: testUserId, role: 'assistant', content: 'Second', aiModel: 'gpt-4' },
-      { conversationId: conversation._id, userId: testUserId, role: 'user', content: 'Third' }
-    ]);
+    await Message.create({ conversationId: conversation._id, userId: testUserId, role: 'user', content: 'First' });
+    await Message.create({ conversationId: conversation._id, userId: testUserId, role: 'assistant', content: 'Second', aiModel: 'gpt-4' });
+    await Message.create({ conversationId: conversation._id, userId: testUserId, role: 'user', content: 'Third' });
 
     const messages = await Message
       .find({ conversationId: conversation._id })

@@ -143,3 +143,18 @@ npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-
     - [X] Wired up the summaryGenerator to conversations (sendMessage mutations - logic is going to be to generate summaries after 10+ messages and keep it updated on the go - 5 messages after that)
     - [X] Background processing, so we don't block the main thread
     - [X] Test summaryGenerator on a file
+
+---
+
+**v0.0.10** - Rate Limit v2 (refactor)
+> Goal: Refactor rate limiter to improve performance and accuracy.
+
+- [X] Add Conversation-Specific Rate Limiting
+- [X] Separate Rate Limit Concerns (message and conversation)
+- [ ] Add Tiered/Role-Based Rate Limiting
+- [ ] Add Rate Limit Analytics
+- [X] Improve Error Messages with Actionable Guidance
+- [ ] Add Redis Health Check & Circuit Breaker
+- [ ] Add Rate Limit Bypass for Admin/Testing
+- [X] Clean up old 'openai' rate limit code
+- [X] Update tests for new limits

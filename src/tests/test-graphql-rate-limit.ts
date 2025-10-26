@@ -12,7 +12,7 @@ async function testGraphQLRateLimit() {
         console.log(`--- Simulated sendMessage Request ${i} ---`);
         
         // This is what your mutation will do
-        const rateLimitResult = await userRateLimiter.checkUserLimit(userId, 'openai');
+        const rateLimitResult = await userRateLimiter.checkUserLimit(userId, 'messages');
         console.log('Rate limit result:', rateLimitResult);
 
         if (!rateLimitResult.allowed) {
