@@ -216,8 +216,8 @@ if (ctx.user.role === 'admin' || process.env.BYPASS_RATE_LIMITS === 'true') {
 ⏳ Add circuit breaker for Redis failures
 ✅ Improve error messages with upgrade CTAs
 ⏳ Add admin bypass capability
-⏳ Update tests for new conversation limits
-⏳ Update tests for tiered limits
+✅ Update tests for new conversation limits
+✅ Update tests for tiered limits
 
 ```
 
