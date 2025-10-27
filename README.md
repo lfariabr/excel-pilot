@@ -6,6 +6,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 
 ## Features Status Control:
 > *Note: ✅ = done, 🔥 = in progress, ⏳ = not started*
+
 | Feature | Status | Version |
 | --- | --- | --- |
 | Node.js + TypeScript | ✅ | _v0.0.1_ |
