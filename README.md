@@ -4,8 +4,9 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/lfariabr/excel-pilot)
 
-## Tech Stack & Version Control:
-| Tech | Status | Version |
+## Features Status Control:
+> *Note: ✅ = done, 🔥 = in progress, ⏳ = not started*
+| Feature | Status | Version |
 | --- | --- | --- |
 | Node.js + TypeScript | ✅ | _v0.0.1_ |
 | MongoDB | ✅ | _v0.0.2_ |
@@ -16,8 +17,8 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | OpenAI | ✅ | _v0.0.7_ |
 | Redis | ✅ | _v0.0.8_ |
 | OpenAI Core | ✅ | _v0.0.9_ |
-| Rate Limiting V2 | 🏗️🧱🔨 | _v0.0.10_ |
-| Jest + Testing | 🏗️🧱🔨 | _v0.0.11_ |
+| Rate Limiting V2 | 🔥 | _v0.0.10_ |
+| Jest + Testing | 🔥 | _v0.0.11_ |
 | Docker | ⏳ | TBD |
 | Winston | ⏳ | TBD |
 
@@ -37,18 +38,18 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 ### **WORK IN PROGRESS**:
 - **v0.0.10** - Rate Limit v2 (refactor):
     - Split responsibilities of Conversations and Messages ✅
-    - Improve current rate limiter ⏳
-    - Create Conversations Rate Limiter, as existing one already covers messages well ⏳
+    - Improve current rate limiter ✅
+    - Add rateLimiter Circuit Breaker ✅
+    
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
-    - Tests for message rate limiter ✅
+    - Tests for message and conversations rate limiter ✅
     - Tests for token budget ✅
-    - Tests for conversations rate limiter ⏳
+    - Tests for user model ✅
     - Tests for authentication ⏳
     - Tests for authorization ⏳
     - Tests for graphql queries ⏳
     - Tests for graphql mutations ⏳
     - Tests for openai ⏳
-    - Tests for redis ⏳
     - Tests for express ⏳
     - Tests for apollo server ⏳
 

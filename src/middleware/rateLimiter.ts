@@ -1,6 +1,7 @@
 import { redisClient } from '../redis/redis';
 import { rateLimitConfig } from '../config/rateLimit.config';
 import { RateLimitResult } from '../schemas/types/rateLimitTypes';
+import { rateLimiterHealth } from './rateLimiterHealth';
 
 // Load Lua scripts
 import { loadLuaScript } from '../redis/loadScript';
@@ -14,9 +15,22 @@ export class UserRateLimiter {
      * @param limitType - type of limit (if openai or messages)
      */
 
-    async checkUserLimit(userId: string, limitType: 'messages' | 'conversations'): Promise<RateLimitResult> {
+    async checkUserLimit(
+        userId: string, 
+        limitType: 'messages' | 'conversations',
+        ): Promise<RateLimitResult> {
         const key = `rateLimit:${userId}:${limitType}`;
         const config = rateLimitConfig[limitType];
+
+        // Check circuit state first
+        if (rateLimiterHealth.isCircuitOpen()) {
+            console.warn(`⚠️ Circuit open: Denying ${limitType} request (fail-closed strategy)`);
+            return {
+                allowed: false,
+                remaining: 0,
+                resetTime: Date.now() + config.windowMs,
+            };
+        }
         
         try {
             const [newCount, ttl] = await redisClient.eval(
@@ -28,6 +42,9 @@ export class UserRateLimiter {
                 key,
                 Math.floor(config.windowMs / 1000)
             ) as [number, number];
+
+            // Record success
+            rateLimiterHealth.recordSuccess();
 
             if (newCount > config.max) {
                 const safeTTL = Number.isFinite(ttl) && ttl > 0 ? ttl : Math.floor(config.windowMs / 1000);
@@ -55,6 +72,9 @@ export class UserRateLimiter {
             //      - Compromise system stability
             // Trade-off: Temporary service degradation during Redis outages,
             //      but maintains security posture and prevents cascading failures.
+            
+            // Record failure
+            rateLimiterHealth.recordFailure('rate-limit');
             return {
                 allowed: false,
                 remaining: 0,
@@ -68,7 +88,10 @@ export class UserRateLimiter {
      * @param userId - user ID from JWT token
      * @param tokensToUse - estimated or actual tokens to consume
      */
-    async checkUserTokenBudget(userId: string, tokensToUse: number): Promise<RateLimitResult> {
+    async checkUserTokenBudget(
+        userId: string, 
+        tokensToUse: number
+    ): Promise<RateLimitResult> {
         // Lua script: atomic INCRBY + TTL repair + rollback if over daily/monthly limits
         // Eliminates race conditions and TOCTOU problems by executing logic server-side
         const dailyKey = `token_budget:daily:${userId}`;
@@ -77,6 +100,16 @@ export class UserRateLimiter {
         // budget limits
         const dailyLimit = 50000; // 50k tokens per day (~$1.00)
         const monthlyLimit = 1000000; // 1M tokens per month (~$20.00)
+        
+        // Check circuit state first
+        if (rateLimiterHealth.isCircuitOpen()) {
+            console.warn(`⚠️ Circuit open: Allowing token budget request (fail-open strategy)`);
+            return {
+                allowed: true,
+                remaining: dailyLimit,
+                resetTime: Date.now() + (24 * 60 * 60 * 1000)
+            };
+        }
 
         try {
             
@@ -94,6 +127,9 @@ export class UserRateLimiter {
                 24 * 60 * 60,
                 30 * 24 * 60 * 60
             ) as [number, number, number, number, number];
+
+            // Record success
+            rateLimiterHealth.recordSuccess();
 
             const safeDailyTTL = Number.isFinite(dailyTTL) && dailyTTL > 0 ? dailyTTL : 24 * 60 * 60;
             const safeMonthlyTTL = Number.isFinite(monthlyTTL) && monthlyTTL > 0 ? monthlyTTL : 30 * 24 * 60 * 60;
@@ -145,6 +181,10 @@ export class UserRateLimiter {
             //      - Alternative: Fail-closed would block all AI features during infrastructure issues
             // Trade-off: Potential minor cost overrun during outages,
             //      but maintains service availability and user trust.
+            
+            // Record failure
+            rateLimiterHealth.recordFailure('token-budget');
+            
             return {
                 allowed: true,
                 remaining: dailyLimit,
