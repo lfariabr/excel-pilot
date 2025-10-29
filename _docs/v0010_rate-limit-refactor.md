@@ -210,14 +210,15 @@ if (ctx.user.role === 'admin' || process.env.BYPASS_RATE_LIMITS === 'true') {
 ✅ Add 'conversations' to checkUserLimit type union
 ✅ Apply conversation rate limit to startConversation
 ✅ Apply message rate limit to sendMessage  
-⏳ Create tiered rate limit configuration
-⏳ Add userTier parameter to rate limiter methods
-⏳ Implement RateLimitAnalytics class
 ✅ Add circuit breaker for Redis failures
 ✅ Improve error messages with upgrade CTAs
-⏳ Add admin bypass capability
 ✅ Update tests for new conversation limits
 ✅ Update tests for tiered limits
+✅ Implement RateLimitAnalytics class
+// Future improvements
+⏳ Create tiered rate limit configuration
+⏳ Add userTier parameter to rate limiter methods
+⏳ Add admin bypass capability
 
 ```
 

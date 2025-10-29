@@ -18,7 +18,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | OpenAI | ✅ | _v0.0.7_ |
 | Redis | ✅ | _v0.0.8_ |
 | OpenAI Core | ✅ | _v0.0.9_ |
-| Rate Limiting V2 | 🔥 | _v0.0.10_ |
+| Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ |
 | Jest + Testing | 🔥 | _v0.0.11_ |
 | Docker | ⏳ | TBD |
 | Winston | ⏳ | TBD |
@@ -35,12 +35,9 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.7** - OpenAI client (Agent, ChatMessage)
 - **v0.0.8** - Redis (Rate Limiting, Token Budget - daily and monthly per user)
 - **v0.0.9** - OpenAI Core (Responses API, Cursor Pagination, Auto Title and Summary)
+- **v0.0.10** - Rate Limit (Circuit Breaker, Analytics, Tiered Limits)
 
 ### **WORK IN PROGRESS**:
-- **v0.0.10** - Rate Limit v2 (refactor):
-    - Split responsibilities of Conversations and Messages ✅
-    - Improve current rate limiter ✅
-    - Add rateLimiter Circuit Breaker ✅
     
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
     - Tests for message and conversations rate limiter ✅

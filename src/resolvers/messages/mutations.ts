@@ -1,13 +1,17 @@
 import { GraphQLError } from "graphql";
 import { requireAuth } from "../../utils/guards";
+
 import Message from "../../models/Message";
 import Conversation from "../../models/Conversation";
+
 import { TokenEstimator } from "../../utils/tokenEstimator";
-import { askOpenAI } from "../../services/openAi";
 import { userRateLimiter } from "../../middleware/rateLimiter";
+import { rateLimitConfig } from "../../config/rateLimit.config";
+import { rateLimitAnalytics } from "../../middleware/rateLimitAnalytics";
+
+import { askOpenAI } from "../../services/openAi";
 import { generateConversationTitle, updateConversationTitle } from "../../services/titleGenerator";
 import { generateConversationSummary, updateConversationSummary } from "../../services/summaryGenerator";
-import { rateLimitConfig } from "../../config/rateLimit.config";
 
 export const messagesMutation = {
     sendMessage: async (_: any, { conversationId, content }: { conversationId: string, content: string }, ctx: any) => {
@@ -23,6 +27,13 @@ export const messagesMutation = {
             'messages'
         );
         if (!rateLimitResult.allowed) {
+            const userTier = ctx.user.plan || ctx.user.tier || ctx.user.subscription?.tier;
+            rateLimitAnalytics.logViolation(
+                ctx.user.sub,
+                'messages',
+                userTier
+            );
+            
             throw new GraphQLError(
                 `Rate limit exceeded. You can make ${rateLimitConfig.messages.max} messages per minute. ` +
                 `Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
