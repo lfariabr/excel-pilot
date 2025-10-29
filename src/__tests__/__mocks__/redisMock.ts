@@ -1,11 +1,16 @@
-type Store = Map<string, { count: number; expireAt?: number }>;
+type StoreEntry = { count: number; expireAt?: number };
+type SortedSetEntry = { member: string; score: number };
+type Store = Map<string, StoreEntry>;
+type SortedSetStore = Map<string, SortedSetEntry[]>;
 
 const store: Store = new Map();
+const sortedSets: SortedSetStore = new Map();
 
 function nowSec() { return Math.floor(Date.now() / 1000); }
 
 export function resetStore() {
   store.clear();
+  sortedSets.clear();
 }
 
 function getEntry(key: string) {
@@ -111,5 +116,191 @@ export function makeRedisMock() {
       }
       throw new Error('Unsupported eval shape in mock');
     },
+    // Sorted set operations for analytics
+    zadd: async (key: string, ...args: any[]) => {
+      if (!sortedSets.has(key)) {
+        sortedSets.set(key, []);
+      }
+      const set = sortedSets.get(key)!;
+      // zadd key score member
+      const score = typeof args[0] === 'number' ? args[0] : parseFloat(args[0]);
+      const member = args[1];
+      set.push({ member, score });
+      return set.length;
+    },
+    zincrby: async (key: string, increment: number, member: string) => {
+      if (!sortedSets.has(key)) {
+        sortedSets.set(key, []);
+      }
+      const set = sortedSets.get(key)!;
+      const existing = set.find(e => e.member === member);
+      if (existing) {
+        existing.score += increment;
+        return existing.score;
+      } else {
+        set.push({ member, score: increment });
+        return increment;
+      }
+    },
+    zcard: async (key: string) => {
+      const set = sortedSets.get(key);
+      return set ? set.length : 0;
+    },
+    zrange: async (key: string, start: number, stop: number, ...args: any[]) => {
+      const set = sortedSets.get(key);
+      if (!set || set.length === 0) return [];
+      
+      const sorted = [...set].sort((a, b) => a.score - b.score);
+      const actualStop = stop === -1 ? sorted.length : stop + 1;
+      const slice = sorted.slice(start, actualStop);
+      
+      // Check if WITHSCORES flag is present
+      const withScores = args.includes('WITHSCORES');
+      if (withScores) {
+        const result: any[] = [];
+        slice.forEach(e => {
+          result.push(e.member, e.score.toString());
+        });
+        return result;
+      }
+      return slice.map(e => e.member);
+    },
+    zrangebyscore: async (key: string, min: number | string, max: number | string) => {
+      const set = sortedSets.get(key);
+      if (!set || set.length === 0) return [];
+      
+      const minScore = typeof min === 'string' ? parseFloat(min) : min;
+      const maxScore = typeof max === 'string' ? parseFloat(max) : max;
+      
+      return set
+        .filter(e => e.score >= minScore && e.score <= maxScore)
+        .sort((a, b) => a.score - b.score)
+        .map(e => e.member);
+    },
+    zremrangebyscore: async (key: string, min: number | string, max: number | string) => {
+      const set = sortedSets.get(key);
+      if (!set) return 0;
+      
+      const minScore = typeof min === 'string' ? parseFloat(min) : min;
+      const maxScore = typeof max === 'string' ? parseFloat(max) : max;
+      
+      const initialLength = set.length;
+      const filtered = set.filter(e => e.score < minScore || e.score > maxScore);
+      sortedSets.set(key, filtered);
+      return initialLength - filtered.length;
+    },
+    zscore: async (key: string, member: string) => {
+      const set = sortedSets.get(key);
+      if (!set) return null;
+      const entry = set.find(e => e.member === member);
+      return entry ? entry.score : null;
+    },
+    // Key operations
+    keys: async (pattern: string) => {
+      // Simple pattern matching: convert glob to regex
+      const regexPattern = pattern
+        .replace(/\*/g, '.*')
+        .replace(/\?/g, '.');
+      const regex = new RegExp(`^${regexPattern}$`);
+      
+      const allKeys = [...store.keys(), ...sortedSets.keys()];
+      return allKeys.filter(k => regex.test(k));
+    },
+    del: async (...keys: string[]) => {
+      let deleted = 0;
+      keys.forEach(key => {
+        if (store.has(key)) {
+          store.delete(key);
+          deleted++;
+        }
+        if (sortedSets.has(key)) {
+          sortedSets.delete(key);
+          deleted++;
+        }
+      });
+      return deleted;
+    },
+    scan: async (cursor: string, ...args: any[]) => {
+      // Simple mock: return all matching keys on first call, empty on subsequent
+      if (cursor !== '0') {
+        return ['0', []];
+      }
+      
+      // Find MATCH argument
+      const matchIndex = args.indexOf('MATCH');
+      const pattern = matchIndex >= 0 ? args[matchIndex + 1] : '*';
+      
+      const regexPattern = pattern
+        .replace(/\*/g, '.*')
+        .replace(/\?/g, '.');
+      const regex = new RegExp(`^${regexPattern}$`);
+      
+      const allKeys = [...store.keys(), ...sortedSets.keys()];
+      const matchedKeys = allKeys.filter(k => regex.test(k));
+      
+      return ['0', matchedKeys];
+    },
+    multi: () => {
+      const ops: Array<() => any> = [];
+      const multiClient: any = {
+        zadd: (key: string, ...args: any[]) => {
+          ops.push(async () => {
+            if (!sortedSets.has(key)) sortedSets.set(key, []);
+            const set = sortedSets.get(key)!;
+            const score = typeof args[0] === 'number' ? args[0] : parseFloat(args[0]);
+            const member = args[1];
+            set.push({ member, score });
+            return set.length;
+          });
+          return multiClient;
+        },
+        zincrby: (key: string, increment: number, member: string) => {
+          ops.push(async () => {
+            if (!sortedSets.has(key)) sortedSets.set(key, []);
+            const set = sortedSets.get(key)!;
+            const existing = set.find(e => e.member === member);
+            if (existing) {
+              existing.score += increment;
+              return existing.score;
+            } else {
+              set.push({ member, score: increment });
+              return increment;
+            }
+          });
+          return multiClient;
+        },
+        zremrangebyscore: (key: string, min: number | string, max: number | string) => {
+          ops.push(async () => {
+            const set = sortedSets.get(key);
+            if (!set) return 0;
+            const minScore = typeof min === 'string' ? parseFloat(min) : min;
+            const maxScore = typeof max === 'string' ? parseFloat(max) : max;
+            const initialLength = set.length;
+            const filtered = set.filter(e => e.score < minScore || e.score > maxScore);
+            sortedSets.set(key, filtered);
+            return initialLength - filtered.length;
+          });
+          return multiClient;
+        },
+        expire: (key: string, seconds: number) => {
+          ops.push(async () => {
+            const e = ensureKey(key);
+            e.expireAt = nowSec() + seconds;
+            return 1;
+          });
+          return multiClient;
+        },
+        exec: async () => {
+          const results = [];
+          for (const op of ops) {
+            results.push(await op());
+          }
+          return results;
+        },
+      };
+      return multiClient;
+    },
+    // No-op for tests
+    quit: async () => Promise.resolve(),
   };
 }

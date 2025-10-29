@@ -27,8 +27,12 @@ export const messagesMutation = {
             'messages'
         );
         if (!rateLimitResult.allowed) {
-            // Log the rate limit violation
-            rateLimitAnalytics.logViolation(ctx.user.sub, 'messages', 'rate_limit_exceeded');
+            const userTier = ctx.user.plan || ctx.user.tier || ctx.user.subscription?.tier;
+            rateLimitAnalytics.logViolation(
+                ctx.user.sub,
+                'messages',
+                userTier
+            );
             
             throw new GraphQLError(
                 `Rate limit exceeded. You can make ${rateLimitConfig.messages.max} messages per minute. ` +

@@ -215,6 +215,7 @@ if (ctx.user.role === 'admin' || process.env.BYPASS_RATE_LIMITS === 'true') {
 ✅ Update tests for new conversation limits
 ✅ Update tests for tiered limits
 ✅ Implement RateLimitAnalytics class
+// Future improvements
 ⏳ Create tiered rate limit configuration
 ⏳ Add userTier parameter to rate limiter methods
 ⏳ Add admin bypass capability

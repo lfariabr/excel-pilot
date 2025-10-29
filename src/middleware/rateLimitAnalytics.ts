@@ -182,7 +182,7 @@ export class RateLimitAnalytics {
             keys.push(...result[1]);
         } while (cursor !== '0');
         
-        return keys;
+        return Array.from(new Set(keys));
     }
 }
 

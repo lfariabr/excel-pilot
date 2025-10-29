@@ -1,5 +1,6 @@
 import express from 'express';
 import { rateLimitAnalytics } from '../middleware/rateLimitAnalytics';
+import { requireAuth } from "../utils/guards";
 
 const router = express.Router();
 const analytics = rateLimitAnalytics;
@@ -12,7 +13,7 @@ const analytics = rateLimitAnalytics;
  *
  * Response: [{ userId: string, count: number }, ...]
  */
-router.get('/top-violators', async (req, res) => {
+router.get('/top-violators', requireAuth, async (req, res) => {
     try {
         const hours = req.query.hours ? Number(req.query.hours) : 24;
         const limit = req.query.limit ? Number(req.query.limit) : 10;

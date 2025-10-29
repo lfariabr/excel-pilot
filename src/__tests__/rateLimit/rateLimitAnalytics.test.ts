@@ -1,64 +1,56 @@
+import { resetStore } from '../__mocks__/redisMock';
+
+// Mock Redis to use in-memory mock instead of real connection
+jest.mock('../../redis/redis', () => {
+  const mock = require('../__mocks__/redisMock');
+  return {
+    redisClient: mock.makeRedisMock(),
+  };
+});
+
 import { RateLimitAnalytics } from '../../middleware/rateLimitAnalytics';
 import { redisClient } from '../../redis/redis';
 import { rateLimiterHealth } from '../../middleware/rateLimiterHealth';
 
 describe('RateLimitAnalytics', () => {
     let analytics: RateLimitAnalytics;
-    let consoleLogSpy: jest.SpyInstance;
 
-    beforeAll(() => {
-        // Suppress Redis close event log to prevent "Cannot log after tests" warning
-        consoleLogSpy = jest.spyOn(console, 'log').mockImplementation((message) => {
-            if (!message?.includes('Redis client connection closed')) {
-                // Allow other logs through
-                console.info(message);
-            }
-        });
-    });
-
-    afterAll(async () => {
-        // Close Redis connection to allow Jest to exit
-        await redisClient.quit();
+    beforeEach(() => {
+        // Restore all mocks first (from previous test spies)
+        jest.restoreAllMocks();
         
-        // Restore console.log
-        if (consoleLogSpy) {
-            consoleLogSpy.mockRestore();
-        }
-    });
-
-    beforeEach(async () => {
+        // Reset in-memory mock store
+        resetStore();
+        
+        // Clear all mocks to prevent spy contamination between tests
+        jest.clearAllMocks();
+        
+        // Create fresh analytics instance
         analytics = new RateLimitAnalytics();
         
-        // Clean up test keys before each test
-        const keys = await redisClient.keys('rate_limit:violations:*');
-        const userKeys = await redisClient.keys('rate_limit:user_violations:*');
-        const allKeys = [...keys, ...userKeys];
-        if (allKeys.length > 0) {
-            await redisClient.del(...allKeys);
-        }
-        
-        // Reset circuit breaker
+        // Reset circuit breaker state
         const health = rateLimiterHealth as any;
         health.circuitState = 'closed';
         health.failures = 0;
         health.lastFailureTime = 0;
+        
+        // Clear any existing timers
+        if (health.halfOpenTimer) {
+            clearTimeout(health.halfOpenTimer);
+            health.halfOpenTimer = undefined;
+        }
     });
 
-    afterEach(async () => {
-        // Clean up after each test
-        const keys = await redisClient.keys('rate_limit:violations:*');
-        const userKeys = await redisClient.keys('rate_limit:user_violations:*');
-        const allKeys = [...keys, ...userKeys];
-        if (allKeys.length > 0) {
-            await redisClient.del(...allKeys);
-        }
-        
+    afterEach(() => {
         // Clear circuit breaker timer to prevent Jest hanging
         const health = rateLimiterHealth as any;
         if (health.halfOpenTimer) {
             clearTimeout(health.halfOpenTimer);
             health.halfOpenTimer = undefined;
         }
+        
+        // Restore all mocks to prevent spy contamination
+        jest.restoreAllMocks();
     });
 
 
