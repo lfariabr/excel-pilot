@@ -3,11 +3,14 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import userRouter from "./routes/user";
 import "dotenv/config";
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "./utils/errorHandler";
 import mongoose from "mongoose";
+
+import userRouter from "./routes/user";
+import rateLimiterLogsRouter from "./routes/rateLimiterLogs";
+
 
 export function createApp() {
     const app = express();
@@ -30,6 +33,7 @@ export function createApp() {
   
     // REST
     app.use("/users", userRouter);
+    app.use("/analytics", rateLimiterLogsRouter);
   
     // Central error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

@@ -1,13 +1,17 @@
 import { GraphQLError } from "graphql";
 import { requireAuth } from "../../utils/guards";
+
 import Message from "../../models/Message";
 import Conversation from "../../models/Conversation";
+
 import { formatTimestamp } from "../../utils/dateFormatter";
 import { TokenEstimator } from "../../utils/tokenEstimator";
 import { getSystemPrompt, askOpenAI } from "../../services/openAi";
-import { userRateLimiter } from "../../middleware/rateLimiter";
 import { generateConversationTitle, updateConversationTitle } from "../../services/titleGenerator";
+
+import { userRateLimiter } from "../../middleware/rateLimiter";
 import { rateLimitConfig } from "../../config/rateLimit.config";
+import { rateLimitAnalytics } from "../../middleware/rateLimitAnalytics";
 
 export const conversationsMutation = {
     startConversation: async (_: any, { content }: { content: string }, ctx: any) => {
@@ -22,6 +26,9 @@ export const conversationsMutation = {
             'conversations'
         );
         if (!rateLimitResult.allowed) {
+            // Log the rate limit violation
+            rateLimitAnalytics.logViolation(ctx.user.sub, 'conversations', 'rate_limit_exceeded');
+            
             throw new GraphQLError(
                 `Rate limit exceeded. You can make ${rateLimitConfig.conversations.max} conversations per minute. ` +
                 `Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
