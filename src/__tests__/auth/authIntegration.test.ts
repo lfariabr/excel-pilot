@@ -73,9 +73,14 @@ describe('Authentication Integration Tests', () => {
 
       await authMutations.register(null, { input });
 
-      // Simulate expired token
-      const expiredToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwicm9sZSI6ImNhc3VhbCIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwMDAwOTAwfQ.invalid';
-      
+      // Generate an expired token
+      const jwt = require('jsonwebtoken');
+      const expiredToken = jwt.sign(
+        { sub: 'user123', role: 'casual', email: 'test@example.com' },
+        process.env.JWT_SECRET || 'dev_secret',
+        { expiresIn: '-1s' }
+      );
+
       const decoded = verifyAccessToken(expiredToken);
       expect(decoded).toBeNull();
 
