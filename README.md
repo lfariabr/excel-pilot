@@ -43,10 +43,10 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - Tests for message and conversations rate limiter ✅
     - Tests for token budget ✅
     - Tests for user model ✅
-    - Tests for authentication ⏳
-    - Tests for authorization ⏳
-    - Tests for graphql queries ⏳
-    - Tests for graphql mutations ⏳
+    - Tests for authentication ✅
+    - Tests for authorization ✅
+    - Tests for conversation queries/mutations ⏳
+    - Tests for message queries/mutations ⏳
     - Tests for openai ⏳
     - Tests for express ⏳
     - Tests for apollo server ⏳
