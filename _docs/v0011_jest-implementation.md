@@ -60,7 +60,7 @@ const store: Map<string, { count: number; expireAt?: number }> = new Map();
 
 ### **Core Functions**
 
-#### **[resetStore()](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:6:0-8:1)** - Test Isolation
+#### **[resetStore()](/excelPilot/src/__tests__/__mocks__/redisMock.ts:6:0-8:1)** - Test Isolation
 ```typescript
 export function resetStore() {
   store.clear();
@@ -69,7 +69,7 @@ export function resetStore() {
 - **Why**: Each test needs a clean slate
 - **When**: Called in `beforeEach()` hook before every test
 
-#### **[getTTL(key)](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:10:0-15:1)** - Check Expiration
+#### **[getTTL(key)](/excelPilot/src/__tests__/__mocks__/redisMock.ts:10:0-15:1)** - Check Expiration
 ```typescript
 function getTTL(key: string) {
   const entry = store.get(key);
@@ -81,7 +81,7 @@ function getTTL(key: string) {
 - **Returns**: Seconds until expiration, or `-1` if no TTL, or `-2` if expired
 - **Redis behavior**: Real Redis also uses `-1` for keys without TTL
 
-#### **[eval()](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5) - The Heart of the Mock**
+#### **[eval()](/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5) - The Heart of the Mock**
 
 This is where we **replicate your Lua scripts** in JavaScript:
 
@@ -111,7 +111,7 @@ eval: async (script: string, numKeys: number, ...args: any[]) => {
 ```
 
 **Why numKeys?**  
-- Your code calls [redisClient.eval(script, 1, key, ...)](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5) or [redisClient.eval(script, 2, dailyKey, monthlyKey, ...)](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5)
+- Your code calls [redisClient.eval(script, 1, key, ...)](/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5) or [redisClient.eval(script, 2, dailyKey, monthlyKey, ...)](/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5)
 - Mock uses `numKeys` to know which function is calling it
 
 ---
@@ -216,9 +216,9 @@ describe('checkUserLimit()', () => {
 ```
 
 **Execution flow:**
-1. [resetStore()](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:6:0-8:1) clears the in-memory map
-2. Call [checkUserLimit()](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/middleware/rateLimiter.ts:11:4-64:5) → triggers your rate limiter code
-3. Rate limiter calls [redisClient.eval(...)](cci:1://file:///Users/luisfaria/Desktop/sEngineer/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5) → **hits mock's eval function**
+1. [resetStore()](/excelPilot/src/__tests__/__mocks__/redisMock.ts:6:0-8:1) clears the in-memory map
+2. Call [checkUserLimit()](/excelPilot/src/middleware/rateLimiter.ts:11:4-64:5) → triggers your rate limiter code
+3. Rate limiter calls [redisClient.eval(...)](/excelPilot/src/__tests__/__mocks__/redisMock.ts:59:4-99:5) → **hits mock's eval function**
 4. Mock increments count to 1, sets TTL, returns `[1, 60]`
 5. Rate limiter processes: `1 < 30` (under limit), calculates remaining = 29
 6. Test assertions verify correct behavior
