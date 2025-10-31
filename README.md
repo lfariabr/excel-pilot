@@ -46,7 +46,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
     - Tests for authentication ✅
     - Tests for authorization ✅
     - Tests for conversation queries/mutations ✅
-    - Tests for message queries/mutations ⏳
+    - Tests for message queries/mutations ✅
     - Tests for openai ⏳
     - Tests for express ⏳
     - Tests for apollo server ⏳

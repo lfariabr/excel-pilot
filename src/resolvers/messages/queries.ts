@@ -23,7 +23,9 @@ export const messagesQuery = {
         // Verify user owns the conversation
         const conversation = await Conversation.findById(conversationId);
         if (!conversation || String(conversation.userId) !== ctx.user.sub) {
-            throw new GraphQLError("FORBIDDEN");
+            throw new GraphQLError("Forbidden", {
+                extensions: { code: "FORBIDDEN" }
+            });
         }
         
         // Build cursor-based query:
