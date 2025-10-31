@@ -40,16 +40,16 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 ### **WORK IN PROGRESS**:
     
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
-    - Tests for message and conversations rate limiter ✅
-    - Tests for token budget ✅
-    - Tests for user model ✅
-    - Tests for authentication ✅
-    - Tests for authorization ✅
-    - Tests for conversation queries/mutations ✅
-    - Tests for message queries/mutations ✅
-    - Tests for openai ⏳
-    - Tests for express ⏳
-    - Tests for apollo server ⏳
+- Tests for message and conversations rate limiter ✅
+- Tests for token budget ✅
+- Tests for user model ✅
+- Tests for authentication ✅
+- Tests for authorization ✅
+- Tests for conversation queries/mutations ✅
+- Tests for message queries/mutations ✅
+- Tests for openai ✅
+- Tests for express ⏳
+- Tests for apollo server ⏳
 
 ### **BACKLOG**:
 
