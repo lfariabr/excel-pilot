@@ -1,3 +1,19 @@
+# Jest Testing
+
+## **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
+- Tests for message and conversations rate limiter ✅
+- Tests for token budget ✅
+- Tests for user model ✅
+- Tests for authentication ✅
+- Tests for authorization ✅
+- Tests for conversation queries/mutations ⏳
+- Tests for message queries/mutations ⏳
+- Tests for openai ⏳
+- Tests for express ⏳
+- Tests for apollo server ⏳
+
+---
+
 # Complete Jest Testing Implementation Walkthrough
 
 I'll break this down into digestible sections, connecting Redis → Lua → Rate Limiting → Jest Mocking.
