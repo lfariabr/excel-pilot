@@ -49,7 +49,11 @@ export const messagesMutation = {
 
         const conversation = await Conversation.findById(conversationId);
         if (!conversation || String(conversation.userId) !== ctx.user.sub) {
-            throw new GraphQLError("FORBIDDEN");
+            throw new GraphQLError("Forbidden", {
+                extensions: {
+                    code: "FORBIDDEN"
+                }
+            });
         }
         const userMessage = await Message.create({
             conversationId,
@@ -117,9 +121,9 @@ export const messagesMutation = {
             aiModel: talkToOpenAI.model,
             usage: talkToOpenAI.usage
                 ? {
-                    inputTokens: talkToOpenAI.usage.input_tokens,
-                    outputTokens: talkToOpenAI.usage.output_tokens,
-                    totalTokens: talkToOpenAI.usage.total_tokens,
+                    input_tokens: talkToOpenAI.usage.input_tokens,
+                    output_tokens: talkToOpenAI.usage.output_tokens,
+                    total_tokens: talkToOpenAI.usage.total_tokens,
                 }
                 : undefined,
         });

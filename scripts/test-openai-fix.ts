@@ -1,7 +1,7 @@
 import 'dotenv/config';
-import { askOpenAI } from '../services/openAi';
+import { askOpenAI } from '../src/services/openAi';
 
-// npx ts-node src/tests/test-openai-fix.ts
+// npx ts-node scripts/test-openai-fix.ts
 
 async function testOpenAIFix() {
     

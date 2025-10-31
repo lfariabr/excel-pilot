@@ -1,7 +1,7 @@
-// npx ts-node src/tests/test-summary-generator.ts
+// npx ts-node scripts/test-summary-generator.ts
 
 import 'dotenv/config';
-import { generateConversationSummary } from '../services/summaryGenerator';
+import { generateConversationSummary } from '../src/services/summaryGenerator';
 
 type Turn = { userMessage: string; aiResponse: string };
 
