@@ -201,19 +201,14 @@ describe('OpenAI Service', () => {
     it('should throw GraphQLError when OpenAI API fails', async () => {
       mockResponsesCreate.mockRejectedValue(new Error('OpenAI API error'));
 
-      await expect(
-        askOpenAI({
-          userMessage: 'Test',
-          history: []
-        })
-      ).rejects.toThrow(GraphQLError);
-
       try {
         await askOpenAI({
           userMessage: 'Test',
           history: []
         });
+        fail('Expected askOpenAI to throw GraphQLError');
       } catch (error: any) {
+        expect(error).toBeInstanceOf(GraphQLError);
         expect(error.extensions.code).toBe('OPENAI_ERROR');
         expect(error.message).toContain('Failed to get response from OpenAI');
         expect(error.extensions.originalError).toBe('OpenAI API error');
