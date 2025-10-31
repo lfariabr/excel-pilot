@@ -1,7 +1,7 @@
-// npx ts-node src/tests/test-title-generator.ts
+// npx ts-node scripts/test-title-generator.ts
 
 import 'dotenv/config';
-import { generateConversationTitle, updateConversationTitle } from '../services/titleGenerator';
+import { generateConversationTitle, updateConversationTitle } from '../src/services/titleGenerator';
 
 async function testTitleGenerator() {
     console.log('🧪 Testing Title Generator...\n');
