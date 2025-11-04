@@ -35,9 +35,24 @@ export function createApp() {
     app.use("/users", userRouter);
     app.use("/analytics", rateLimiterLogsRouter);
   
+    // 404 handler - must come before error handler
+    app.use((_req: Request, res: Response) => {
+      res.status(404).json({ error: "Not found" });
+    });
+  
     // Central error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      if (err?.code === 11000) return res.status(409).json({ error: "Duplicate key", details: err.keyValue });
+      // Handle MongoDB duplicate key errors
+      if (err?.code === 11000) {
+        return res.status(409).json({ error: "Duplicate key", details: err.keyValue });
+      }
+      
+      // Handle express.json() payload size errors
+      if (err.type === "entity.too.large") {
+        return res.status(413).json({ error: "Payload too large" });
+      }
+      
+      // Handle all other errors
       const status = err instanceof AppError ? err.status : 500;
       res.status(status).json({ error: err.message || "Server error" });
     });
