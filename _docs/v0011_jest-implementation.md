@@ -6,10 +6,10 @@
 - Tests for user model ✅
 - Tests for authentication ✅
 - Tests for authorization ✅
-- Tests for conversation queries/mutations ⏳
-- Tests for message queries/mutations ⏳
-- Tests for openai ⏳
-- Tests for express ⏳
+- Tests for conversation queries/mutations ✅
+- Tests for message queries/mutations ✅
+- Tests for openai ✅
+- Tests for express ✅
 - Tests for apollo server ⏳
 
 ---
