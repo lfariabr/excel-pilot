@@ -10,7 +10,7 @@
 - Tests for message queries/mutations ✅
 - Tests for openai ✅
 - Tests for express ✅
-- Tests for apollo server ⏳
+- Tests for apollo server ✅
 
 ---
 
