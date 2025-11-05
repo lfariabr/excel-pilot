@@ -42,6 +42,7 @@ describe('Express App', () => {
 
     it('GET /ready should return 503 when mongo is disconnected', async () => {
       // Disconnect mongoose
+      // Note: This test temporarily disconnects Mongoose and must run sequentially
       await mongoose.disconnect();
 
       const response = await request(app)
@@ -122,9 +123,9 @@ describe('Express App', () => {
       const response = await request(app)
         .get('/users');
 
-      // Router should be mounted (not general 404)
+      // Router should be mounted - expect auth/method errors, not 404
       expect(response.status).toBeDefined();
-      expect(response.status).not.toBe(404);
+      expect([40, 401, 405, 500]).toContain(response.status);
     });
 
     it('should mount /analytics routes', async () => {

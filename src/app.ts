@@ -42,6 +42,15 @@ export function createApp() {
   
     // Central error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+      // Log errors for monitoring (exclude 4xx client errors)
+      if (!err.status || err.status >= 500) {
+        console.error('Server error:', {
+          message: err.message,
+          stack: err.stack,
+          code: err.code,
+          type: err.type
+        });
+      }
       // Handle MongoDB duplicate key errors
       if (err?.code === 11000) {
         return res.status(409).json({ error: "Duplicate key", details: err.keyValue });
