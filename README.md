@@ -19,7 +19,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | Redis | ✅ | _v0.0.8_ |
 | OpenAI Core | ✅ | _v0.0.9_ |
 | Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ |
-| Jest + Testing | 🔥 | _v0.0.11_ |
+| Jest + Testing | ✅ | _v0.0.11_ |
 | Docker | ⏳ | TBD |
 | Winston | ⏳ | TBD |
 
@@ -36,21 +36,9 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.8** - Redis (Rate Limiting, Token Budget - daily and monthly per user)
 - **v0.0.9** - OpenAI Core (Responses API, Cursor Pagination, Auto Title and Summary)
 - **v0.0.10** - Rate Limit (Circuit Breaker, Analytics, Tiered Limits)
+- **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
 
 ### **WORK IN PROGRESS**:
-    
-- **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
-- Tests for message and conversations rate limiter ✅
-- Tests for token budget ✅
-- Tests for user model ✅
-- Tests for authentication ✅
-- Tests for authorization ✅
-- Tests for conversation queries/mutations ✅
-- Tests for message queries/mutations ✅
-- Tests for openai ✅
-- Tests for express ⏳
-- Tests for apollo server ⏳
-
 ### **BACKLOG**:
 
 - **tbd** - Caching (Redis-based)

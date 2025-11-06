@@ -151,10 +151,26 @@ npm install express-rate-limit rate-limit-redis ioredis @types/ioredis --legacy-
 
 - [X] Add Conversation-Specific Rate Limiting
 - [X] Separate Rate Limit Concerns (message and conversation)
-- [ ] Add Tiered/Role-Based Rate Limiting
-- [ ] Add Rate Limit Analytics
+- [X] Add Tiered/Role-Based Rate Limiting
+- [X] Add Rate Limit Analytics
 - [X] Improve Error Messages with Actionable Guidance
-- [ ] Add Redis Health Check & Circuit Breaker
-- [ ] Add Rate Limit Bypass for Admin/Testing
+- [X] Add Redis Health Check & Circuit Breaker
+- [X] Add Rate Limit Bypass for Admin/Testing
 - [X] Clean up old 'openai' rate limit code
 - [X] Update tests for new limits
+
+---
+
+**v0.0.11** - Jest + Testing
+> Goal: Implement comprehensive testing with Jest to ensure code quality and prevent regressions.
+
+- [X] Set up Jest with TypeScript support
+- [X] Configure Jest to work with GraphQL and MongoDB
+- [X] Add unit tests for core functions (auth, rate limiting, OpenAI integration)
+- [X] Add integration tests for API endpoints
+- [X] Add E2E tests for complete user flows
+- [X] Implement test coverage reporting
+- [X] Add mock implementations for external services (OpenAI, Redis)
+- [X] Create test database for isolated testing
+- [X] Add CI/CD pipeline with Jest tests
+
