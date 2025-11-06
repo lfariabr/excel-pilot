@@ -4,19 +4,19 @@
 
 ## **📚 Table of Contents**
 
-1. [Testing Fundamentals - What You Built](#1-testing-fundamentals)
-2. [Your Test Coverage Map](#2-your-test-coverage-map)
-3. [Key Concepts You Must Explain](#3-key-concepts-you-must-explain)
-4. [Interview Questions You Can Crush](#4-interview-questions-you-can-crush)
-5. [Code Examples from Your Project](#5-code-examples-from-your-project)
-6. [Testing Anti-Patterns You Avoided](#6-testing-anti-patterns-you-avoided)
-7. [Advanced Topics You Demonstrated](#7-advanced-topics-you-demonstrated)
+1. [Testing Fundamentals - What I've Built](#1-testing-fundamentals)
+2. [My Test Coverage Map](#2-my-test-coverage-map)
+3. [Key Concepts Explained](#3-key-concept-explained)
+4. [Interview Questions To Crush](#4-interview-questions-to-crush)
+5. [Code Examples from My Project](#5-code-examples-from-my-project)
+6. [Testing Anti-Patterns I Avoided](#6-testing-anti-patterns-i-avoided)
+7. [Advanced Topics Demonstrated](#7-advanced-topics-demonstrated)
 
 ---
 
-## **1. Testing Fundamentals - What You Built**
+## **1. Testing Fundamentals - What I've Built**
 
-### **Test Pyramid You Implemented**
+### **Test Pyramid I Implemented**
 
 ```
          /\
@@ -50,36 +50,36 @@
 
 ---
 
-## **2. Your Test Coverage Map**
+## **2. My Test Coverage Map**
 
-### **✅ What You Tested (100% Interview Ready)**
+### **✅ What I Tested (100% Interview Ready)**
 
 | Component | Tests | Type | Key Learnings |
 |-----------|-------|------|---------------|
-| **JWT Utils** | 8 tests | Unit | Token lifecycle, expiration, security |
-| **Auth Guards** | 5 tests | Unit | Authorization, role-based access |
-| **User Model** | 6 tests | Integration | Mongoose validation, hooks, methods |
-| **Auth Mutations** | 6 tests | Integration | User registration, login, JWT flow |
-| **Auth Queries** | 2 tests | Integration | Protected routes, context |
+| **JWT Utils** | 13 tests | Unit | Token lifecycle, expiration, security |
+| **Auth Guards** | 8 tests | Unit | Authorization, role-based access |
+| **User Model** | 2 tests | Integration | Mongoose validation, hooks, methods |
+| **Auth Mutations** | 12 tests | Integration | User registration, login, JWT flow |
+| **Auth Queries** | 4 tests | Integration | Protected routes, context |
 | **Conversation Queries** | 8 tests | Integration | Pagination, filtering, ownership |
-| **Conversation Mutations** | 11 tests | Integration | Rate limiting, OpenAI integration |
+| **Conversation Mutations** | 12 tests | Integration | Rate limiting, OpenAI integration |
 | **Message Queries** | 8 tests | Integration | Cursor pagination, sorting, timestamps |
-| **Message Mutations** | 16 tests | Integration | Complex business logic, error handling |
+| **Message Mutations** | 17 tests | Integration | Complex business logic, error handling |
 | **Rate Limiter** | 10 tests | Integration | Redis, concurrency, time windows |
 | **Token Budget** | 8 tests | Integration | Cost tracking, limits, resets |
 | **OpenAI Service** | 12 tests | Unit | External API mocking, error handling |
 | **Express App** | 16 tests | Integration | Middleware, routing, security headers |
-| **Apollo Server** | 15 tests | E2E | Schema, resolvers, authentication |
+| **Apollo Server** | 20 tests | E2E | Schema, resolvers, authentication |
 
-**Total: ~130 tests covering all critical paths**
-
+**Total: ~200 tests covering all critical paths**
+> Run: `npm test` (all tests pass in ~20 seconds)
 ---
 
-## **3. Key Concepts You Must Explain**
+## **3. Key Concepts Explained**
 
 ### **A. Test Doubles (Mocking Strategy)**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 // Mock external dependencies FIRST
 jest.mock('../../services/openAi');
@@ -103,7 +103,7 @@ import { askOpenAI } from '../../services/openAi';
 
 ### **B. Test Isolation & Setup/Teardown**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 describe('Message Mutations', () => {
   let mongoServer: MongoMemoryServer;
@@ -144,7 +144,7 @@ describe('Message Mutations', () => {
 
 ### **C. AAA Pattern (Arrange-Act-Assert)**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 it('should throw RATE_LIMIT_EXCEEDED when limit is hit', async () => {
   // ARRANGE - Set up test conditions
@@ -184,7 +184,7 @@ it('should throw RATE_LIMIT_EXCEEDED when limit is hit', async () => {
 
 ### **D. Integration vs Unit Testing Trade-offs**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 // ❌ BEFORE: Over-mocked conversation query tests
 jest.mock('../../models/Conversation');
@@ -215,7 +215,7 @@ usage: {
 
 ### **E. Testing Authentication & Authorization**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 it('should throw UNAUTHENTICATED when user is null', async () => {
   const ctx = { user: null };
@@ -261,7 +261,7 @@ it('should throw FORBIDDEN when user does not own conversation', async () => {
 
 ### **F. Testing Async Code & Concurrency**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 it('should handle concurrent requests correctly', async () => {
   const userId = 'test-user';
@@ -289,7 +289,7 @@ it('should handle concurrent requests correctly', async () => {
 
 ### **G. Testing Error Handling**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 it('should throw GraphQLError when OpenAI API fails', async () => {
   mockResponsesCreate.mockRejectedValue(new Error('OpenAI API error'));
@@ -321,7 +321,7 @@ it('should throw GraphQLError when OpenAI API fails', async () => {
 
 ### **H. Testing Rate Limiting & Resource Protection**
 
-**What You Did:**
+**What I Did:**
 ```typescript
 it('should enforce daily token budget limit', async () => {
   const userId = 'test-user';
@@ -361,11 +361,11 @@ it('should reset token budget after 24 hours', async () => {
 
 ---
 
-## **4. Interview Questions You Can Crush**
+## **4. Interview Questions To Crush**
 
 ### **Q1: "Explain the difference between unit, integration, and E2E tests."**
 
-**Your Answer:**
+**My Answer:**
 > "In my ExcelPilot project, I implemented all three:
 > 
 > **Unit Tests** test single functions in isolation. For example, my JWT utility tests verify token signing and verification without touching the database or network. I mock all dependencies.
@@ -380,7 +380,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q2: "How do you handle testing asynchronous code?"**
 
-**Your Answer:**
+**My Answer:**
 > "I use async/await consistently. For example:
 >
 > ```typescript
@@ -404,7 +404,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q3: "How do you decide what to mock vs what to use real implementations?"**
 
-**Your Answer:**
+**My Answer:**
 > "I mock **external dependencies** (OpenAI API, Redis) but use **real internal code**. 
 >
 > **Mock:**
@@ -423,7 +423,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q4: "How do you ensure tests are maintainable?"**
 
-**Your Answer:**
+**My Answer:**
 > "I follow several practices:
 >
 > 1. **DRY setup:** Use `beforeEach` for common test data
@@ -454,7 +454,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q5: "How do you test authentication and authorization?"**
 
-**Your Answer:**
+**My Answer:**
 > "I test three layers:
 >
 > **1. JWT Token Lifecycle:**
@@ -479,7 +479,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q6: "Describe a time when tests caught a production bug."**
 
-**Your Answer:**
+**My Answer:**
 > "**Bug #1: Field Name Mismatch**
 > My mutation saved token usage as:
 > ```typescript
@@ -510,7 +510,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q7: "How do you handle flaky tests?"**
 
-**Your Answer:**
+**My Answer:**
 > "Flaky tests are usually caused by:
 >
 > 1. **Shared state** - Fixed with proper cleanup in `afterEach`
@@ -538,7 +538,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q8: "What's your testing workflow in CI/CD?"**
 
-**Your Answer:**
+**My Answer:**
 > "My tests are designed for CI/CD:
 >
 > **Pre-commit:**
@@ -566,7 +566,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q9: "How do you test GraphQL resolvers?"**
 
-**Your Answer:**
+**My Answer:**
 > "I test at two levels:
 >
 > **1. Direct Resolver Tests (Integration):**
@@ -595,7 +595,7 @@ it('should reset token budget after 24 hours', async () => {
 
 ### **Q10: "How do you test error scenarios?"**
 
-**Your Answer:**
+**My Answer:**
 > "I test errors as thoroughly as success cases:
 >
 > **Expected Errors (Business Logic):**
@@ -625,12 +625,12 @@ it('should reset token budget after 24 hours', async () => {
 
 ---
 
-## **5. Code Examples from Your Project**
+## **5. Code Examples from My Project**
 
 ### **Example 1: Complete Test Structure**
 
 ```typescript
-// Real example from your codebase
+// Real example from my codebase
 describe('Message Mutations', () => {
   let mongoServer: MongoMemoryServer;
   let testUserId: mongoose.Types.ObjectId;
@@ -760,7 +760,7 @@ it('should trigger title generation on first conversation (2 messages)', async (
 
 ---
 
-## **6. Testing Anti-Patterns You Avoided**
+## **6. Testing Anti-Patterns I Avoided**
 
 ### **❌ Anti-Pattern #1: Testing Implementation Details**
 
@@ -878,7 +878,7 @@ it('should create message with AI response', async () => {
 
 ---
 
-## **7. Advanced Topics You Demonstrated**
+## **7. Advanced Topics Demonstrated**
 
 ### **A. Testing Complex State Machines**
 
@@ -1177,7 +1177,7 @@ it('should handle OpenAI failures', async () => {
 
 ---
 
-## **Anti-Patterns You Avoided**
+## **Anti-Patterns I Avoided**
 
 ### ❌ **Testing Implementation**
 ```typescript
