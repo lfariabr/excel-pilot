@@ -1,6 +1,6 @@
 // __tests__/apollo/server.test.ts
 
-// Set dummy OpenAI API key BEFORE any imports
+// Set dummy OpenAI API key for tests (required before imports)
 process.env.OPENAI_API_KEY = 'test-api-key';
 
 // Mock external dependencies FIRST - before any imports that use them
@@ -18,7 +18,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import UserModel from '../../models/User';
 import Conversation from '../../models/Conversation';
 import Message from '../../models/Message';
-import { signAccessToken } from '../../utils/jwt';
+import { signAccessToken, verifyAccessToken } from '../../utils/jwt';
 
 import { askOpenAI } from '../../services/openAi';
 import { generateConversationTitle } from '../../services/titleGenerator';
@@ -30,6 +30,15 @@ describe('Apollo Server', () => {
   let mongoServer: MongoMemoryServer;
   let testUserId: mongoose.Types.ObjectId;
   let authToken: string;
+
+  // Helper to create context from JWT token (mimics real context creation)
+  const createContextFromToken = (token?: string) => {
+    if (!token) {
+      return { user: null };
+    }
+    const decoded = verifyAccessToken(token);
+    return { user: decoded };
+  };
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
@@ -491,12 +500,17 @@ describe('Apollo Server', () => {
 
   describe('Integration', () => {
     it('should handle complete authentication flow', async () => {
-      // 1. Register
+      // 1. Register a new user
       const registerResponse = await server.executeOperation({
         query: `
           mutation Register($input: RegisterInput!) {
             register(input: $input) {
               accessToken
+              user {
+                id
+                email
+                name
+              }
             }
           }
         `,
@@ -512,32 +526,45 @@ describe('Apollo Server', () => {
 
       expect(registerResponse.body.kind).toBe('single');
       if (registerResponse.body.kind === 'single') {
+        expect(registerResponse.body.singleResult.errors).toBeUndefined();
         const token = (registerResponse.body.singleResult.data as any)?.register.accessToken;
+        const registeredUser = (registerResponse.body.singleResult.data as any)?.register.user;
+        
         expect(token).toBeDefined();
+        expect(registeredUser.email).toBe('flow@example.com');
 
-        // 2. Use token to query me
+        // 2. Use the JWT token to query 'me' - tests real JWT verification
+        const context = createContextFromToken(token);
+        
         const meResponse = await server.executeOperation(
           {
             query: `
               query Me {
                 me {
+                  id
                   email
+                  name
+                  role
                 }
               }
             `,
           },
           {
-            contextValue: {
-              user: {
-                sub: testUserId.toString(),
-                email: 'flow@example.com',
-                role: 'casual'
-              }
-            },
+            contextValue: context,
           }
         );
 
         expect(meResponse.body.kind).toBe('single');
+        if (meResponse.body.kind === 'single') {
+          expect(meResponse.body.singleResult.errors).toBeUndefined();
+          const meData = (meResponse.body.singleResult.data as any)?.me;
+          
+          // Verify the token decoded correctly and matches registered user
+          expect(meData.email).toBe('flow@example.com');
+          expect(meData.name).toBe('Flow Test');
+          expect(meData.role).toBe('casual');
+          expect(meData.id).toBe(registeredUser.id);
+        }
       }
     });
 
