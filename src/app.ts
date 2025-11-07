@@ -34,12 +34,10 @@ export function createApp() {
     // REST
     app.use("/users", userRouter);
     app.use("/analytics", rateLimiterLogsRouter);
-  
-    // 404 handler - must come before error handler
-    app.use((_req: Request, res: Response) => {
-      res.status(404).json({ error: "Not found" });
-    });
-  
+
+  // NOTE: 404 handler must be registered AFTER GraphQL attachment
+  // See server.ts for proper middleware order
+
     // Central error handler
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       // Log errors for monitoring (exclude 4xx client errors)

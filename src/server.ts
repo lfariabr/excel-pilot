@@ -6,7 +6,7 @@ import http from "http";
 import { createApp } from "./app";
 
 // GraphQL / Apollo Server
-import { attachGraphQL } from "./graphql";
+import { attachGraphQL, register404Handler } from "./graphql";
 
 // Redis
 import { redisClient, connectRedis } from "./redis/redis";
@@ -20,7 +20,11 @@ async function start() {
     const app = createApp();
     const httpServer = http.createServer(app);
   
+    // Attach GraphQL BEFORE 404 handler
     await attachGraphQL(app, httpServer);
+  
+    // Register 404 handler AFTER all routes
+    register404Handler(app);
   
     const PORT = Number(process.env.PORT) || 4000;
     httpServer.listen(PORT, () => {

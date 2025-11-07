@@ -76,3 +76,16 @@ export async function attachGraphQL(
     })
   );
 }
+
+/**
+ * Register 404 handler AFTER all routes (including GraphQL)
+ * This must be called after attachGraphQL to avoid catching GraphQL requests
+ */
+export function register404Handler(app: express.Express) {
+  app.use((_req: express.Request, res: express.Response) => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log("404 Not Found:", _req.path);
+    }
+    res.status(404).json({ error: "Not found" });
+  });
+}
