@@ -20,7 +20,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | OpenAI Core | ✅ | _v0.0.9_ |
 | Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ |
 | Jest + Testing | ✅ | _v0.0.11_ |
-| Docker | ⏳ | TBD |
+| Docker | 🔥 | _v0.0.12_ |
 | Winston | ⏳ | TBD |
 
 ## **Detailed Changelog** 
@@ -39,18 +39,19 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
 
 ### **WORK IN PROGRESS**:
+
+- **v0.0.12** - Docker
+    - Containerize the app
+    - Multi-stage build
+    - Docker compose with MongoDB and Redis
+    - Environment variables
+
 ### **BACKLOG**:
 
 - **tbd** - Caching (Redis-based)
     - Cache similar user queries (24h TTL)
     - Cache conversation context
     - Cache system prompts and briefing data
-
-- **tbd** - Docker
-    - Containerize the app
-    - Multi-stage build
-    - Docker compose with MongoDB and Redis
-    - Environment variables
 
 - **tbd** - Winston
     - Request/response logging

@@ -72,7 +72,7 @@
 | **Apollo Server** | 20 tests | E2E | Schema, resolvers, authentication |
 
 **Total: ~200 tests covering all critical paths**
-> Run: `npm test` (all tests pass in ~20 seconds)
+> Run: `npm test` (all tests pass in ~20 seconds) or `npm run test:watch` for interactive development
 ---
 
 ## **3. Key Concepts Explained**
