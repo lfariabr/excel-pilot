@@ -40,15 +40,15 @@ router.get("/:id", requireAuth, async (req, res, next) => {
 //   -d '{"name":"Luis","email":"luis@example.com","role":"admin"}'
 router.post("/", async (req, res, next) => {
     try {
-        const { name, email, role } = req.body;
-        if (!name || !email || !role) throw new AppError(400, "Missing required fields");
+        const { name, email, password, role } = req.body;
+        if (!name || !email || !password || !role) throw new AppError(400, "Missing required fields");
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new AppError(400, 'Invalid email format');
-        if (!['user', 'admin'].includes(role)) throw new AppError(400, 'Invalid role');
+        if (!['admin', 'casual', 'head', 'manager'].includes(role)) throw new AppError(400, 'Invalid role');
         
         const exists = await UserModel.findOne({ email }).lean();
         if (exists) throw new AppError(409, "User already exists");
 
-        const user = await UserModel.create({ name, email, role });
+        const user = await UserModel.create({ name, email, password, role });
         res.status(201).json(user);
     } catch (error) {
         next(error);

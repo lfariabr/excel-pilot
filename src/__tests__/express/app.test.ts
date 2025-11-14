@@ -5,6 +5,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { createApp } from '../../app';
+import { register404Handler } from '../../graphql';
 
 describe('Express App', () => {
   let app: express.Express;
@@ -14,6 +15,8 @@ describe('Express App', () => {
     mongoServer = await MongoMemoryServer.create();
     await mongoose.connect(mongoServer.getUri());
     app = createApp();
+    // Register 404 handler (normally done in server.ts)
+    register404Handler(app);
   });
 
   afterAll(async () => {
@@ -77,15 +80,21 @@ describe('Express App', () => {
     });
 
     it('should parse JSON request bodies', async () => {
-      const testData = { email: 'test@example.com', password: 'test123' };
+      const testData = { 
+        name: 'Test User', 
+        email: `test-${Date.now()}@example.com`, // Unique email to avoid 409
+        password: 'test123',
+        role: 'casual'
+      };
       
       const response = await request(app)
-        .post('/users/login')
+        .post('/users')
         .send(testData)
         .set('Content-Type', 'application/json');
 
-      // Should process JSON (even if auth fails, JSON was parsed)
+      // Should process JSON and return JSON (201 created)
       expect(response.headers['content-type']).toMatch(/json/);
+      expect(response.status).toBe(201);
     });
 
     it('should reject oversized JSON payloads', async () => {
@@ -93,7 +102,7 @@ describe('Express App', () => {
       const largePayload = { data: 'x'.repeat(2 * 1024 * 1024) }; // 2MB
       
       const response = await request(app)
-        .post('/users/login')
+        .post('/users')
         .send(largePayload)
         .set('Content-Type', 'application/json');
 
