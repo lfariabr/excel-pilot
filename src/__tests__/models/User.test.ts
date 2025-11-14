@@ -59,11 +59,33 @@ describe('User Model', () => {
     });
 
     it('should enforce required fields', async () => {
+      // Missing name
       await expect(
         UserModel.create({
-          email: 'x@x.com'
-        })).rejects.toThrow();
-    });
+          email: 'test1@x.com',
+          password: 'pass123',
+          role: 'casual'
+        })
+      ).rejects.toThrow(/name/i);
+      
+      // Missing password
+      await expect(
+        UserModel.create({
+          name: 'Test',
+          email: 'test2@x.com',
+          role: 'casual'
+        })
+      ).rejects.toThrow(/password/i);
+      
+      // Missing role
+      await expect(
+        UserModel.create({
+          name: 'Test',
+          email: 'test3@x.com',
+          password: 'pass123'
+        })
+      ).rejects.toThrow(/role/i);
+     });
   });
 
   describe('Password Hashing', () => {

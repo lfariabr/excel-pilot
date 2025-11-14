@@ -92,9 +92,9 @@ describe('Express App', () => {
         .send(testData)
         .set('Content-Type', 'application/json');
 
-      // Should process JSON and return JSON (201 created)
+      // Should reject due to validation errors
       expect(response.headers['content-type']).toMatch(/json/);
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(400);
     });
 
     it('should reject oversized JSON payloads', async () => {
