@@ -18,7 +18,7 @@ export const authMutations = {
             });
         }
 
-        const user = await UserModel.create({ name, email, password, role: role || "user" });
+        const user = await UserModel.create({ name, email, password, role: role || "casual" });
         const accessToken = signAccessToken({
             sub: user.id,
             role: user.role,

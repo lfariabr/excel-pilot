@@ -40,15 +40,16 @@ router.get("/:id", requireAuth, async (req, res, next) => {
 //   -d '{"name":"Luis","email":"luis@example.com","role":"admin"}'
 router.post("/", async (req, res, next) => {
     try {
-        const { name, email, role } = req.body;
-        if (!name || !email || !role) throw new AppError(400, "Missing required fields");
+        const { name, email, password, role } = req.body;
+        if (!name || !email || !password || !role) throw new AppError(400, "Missing required fields");
+        if (password.length < 8) throw new AppError(400, "Password must be at least 8 characters long");
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new AppError(400, 'Invalid email format');
-        if (!['user', 'admin'].includes(role)) throw new AppError(400, 'Invalid role');
+        if (!['admin', 'casual', 'head', 'manager'].includes(role)) throw new AppError(400, 'Invalid role');
         
         const exists = await UserModel.findOne({ email }).lean();
         if (exists) throw new AppError(409, "User already exists");
 
-        const user = await UserModel.create({ name, email, role });
+        const user = await UserModel.create({ name, email, password, role });
         res.status(201).json(user);
     } catch (error) {
         next(error);
@@ -64,7 +65,12 @@ router.patch("/:id", requireAuth,async (req, res, next) => {
     try {
         const { id } = req.params;
         if (!Types.ObjectId.isValid(id)) throw new AppError(400, "Invalid id");
-        const doc = await UserModel.findByIdAndUpdate(id, { $set: req.body }, { new: true }).lean();
+        // Prevent direct password updates
+        const { password, ...updateData } = req.body;
+        if (password !== undefined) {
+            throw new AppError(400, "Use dedicated password change endpoint");
+        }
+        const doc = await UserModel.findByIdAndUpdate(id, { $set: updateData }, { new: true }).lean();
         if (!doc) throw new AppError(404, "Not found");
         res.json(doc);
     } catch (error) {
