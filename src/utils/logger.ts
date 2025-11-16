@@ -15,6 +15,13 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const packageJson = JSON.parse(
+  readFileSync(join(__dirname, '../../package.json'), 'utf-8')
+);
+const APP_VERSION = packageJson.version;
 
 // ============================================
 // TYPES & ENUMS
@@ -170,7 +177,13 @@ const httpFileTransport = new DailyRotateFile({
   datePattern: 'YYYY-MM-DD',
   maxSize: '50m',
   maxFiles: '7d',
-  format: prodFormat,
+  format: winston.format.combine(
+    winston.format((info) => {
+      // Only log messages with level exactly 'http'
+      return info.level === 'http' ? info : false;
+    })(),
+    prodFormat
+  ),
   level: 'http',
 });
 
@@ -184,7 +197,7 @@ const logger = winston.createLogger({
   defaultMeta: {
     service: 'excel-pilot',
     environment: process.env.NODE_ENV || 'development',
-    version: '0.0.13',
+    version: APP_VERSION,
   },
   transports: [
     consoleTransport,
