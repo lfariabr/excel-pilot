@@ -7,3 +7,7 @@ coverage/
 
 # Windsurf
 .windsurf
+
+# Logs
+logs/
+*.log

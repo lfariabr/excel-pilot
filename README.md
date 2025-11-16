@@ -21,7 +21,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ |
 | Jest + Testing | ✅ | _v0.0.11_ |
 | Docker | ✅ | _v0.0.12_ |
-| Winston | ⏳ | TBD |
+| Winston | ⏳ | _v0.0.13_ |
 
 ## **Detailed Changelog** 
 
@@ -37,7 +37,8 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.9** - OpenAI Core (Responses API, Cursor Pagination, Auto Title and Summary)
 - **v0.0.10** - Rate Limit (Circuit Breaker, Analytics, Tiered Limits)
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
-- **v0.0.12** - Docker: Containerized with multi-stage build, Docker Compose, and environment configuration
+- **v0.0.12** - Docker: Containerized with multi-stage build, Docker Compose
+- **v0.0.13** - Winston: Production-grade logging system
 
 ### **WORK IN PROGRESS**:
 
@@ -45,17 +46,14 @@ tbd
 
 ### **BACKLOG**:
 
-- **v0.0.13** - Winston
-    - Request/response logging
-    - Performance metrics
-    - Error tracking
-    - Rate limit events
-
 - **tbd** - Caching (Redis-based)
     - Cache similar user queries (24h TTL)
     - Cache conversation context
     - Cache system prompts and briefing data
 
-- **tbd** - Study Jenkins + GitHub Actions
+- **tbd** - Jenkins
+- **tbd** - Monitoring and Alerting (Prometheus, Grafana)
+- **tbd** - CI/CD (GitHub Actions)
+
 
 

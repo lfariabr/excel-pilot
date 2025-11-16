@@ -1,4 +1,5 @@
 import Redis from "ioredis";
+import { logRedis, logError } from "../utils/logger";
 
 const redisConfig = {
     host: process.env.REDIS_HOST || "localhost",
@@ -17,24 +18,39 @@ export const redisClient = new Redis(redisConfig);
 export async function connectRedis() {
   try {
     await redisClient.connect();
-    console.log('... 📖 Redis connected');
+    logRedis('Redis connected successfully', {
+      host: redisConfig.host,
+      port: redisConfig.port
+    });
   }
   catch (err) {
-    console.error('❌ Redis connection error:', err);
+    logError('Redis connection failed', err as Error, {
+      host: redisConfig.host,
+      port: redisConfig.port
+    });
     process.exit(1);
   }
 }
 
 redisClient.on("ready", () => {
-    // console.log("... ✅ Redis client ready")
+    logRedis('Redis client ready', {
+      host: redisConfig.host,
+      port: redisConfig.port
+    });
 })
 
 redisClient.on('error', (err) => {
-    console.error('❌ Redis client error:', err.message);
+    logError('Redis client error', err, {
+      host: redisConfig.host,
+      port: redisConfig.port
+    });
   });
   
   redisClient.on('close', () => {
-    console.log('🔌 Redis client connection closed');
+    logRedis('Redis client connection closed', {
+      host: redisConfig.host,
+      port: redisConfig.port
+    });
   });
   
   // Graceful shutdown

@@ -1,5 +1,6 @@
 import UserModel from "../../models/User";
 import { requireAuth } from "../../utils/guards";
+import { logGraphQL, logError } from "../../utils/logger";
 
 export const usersQuery = {
     // get all users
@@ -11,12 +12,15 @@ export const usersQuery = {
         // curl -X POST http://localhost:4000/graphql \
         //   -H "Content-Type: application/json" \
         //   -d '{"query":"{ users { id name email role } }"}'
-            console.log('🔍 GraphQL users query called');
+            logGraphQL('GraphQL users query called', { userId: ctx.user?.sub });
             const users = await UserModel.find().lean();
-            console.log('📊 Found users:', users?.length || 0);
+            logGraphQL('GraphQL users query completed', { 
+                userId: ctx.user?.sub,
+                count: users?.length || 0 
+            });
             return users || [];
         } catch (error) {
-            console.error('❌ Error in users query:', error);
+            logError('Error in users query', error as Error, { userId: ctx.user?.sub });
             throw error;
         }
     },
@@ -25,12 +29,22 @@ export const usersQuery = {
     user: async (_: any, { id }: { id: string }, ctx: any) => {
         requireAuth(ctx);
         try {
-            console.log('🔍 GraphQL user query called with id:', id);
+            logGraphQL('GraphQL user query called', { 
+                userId: ctx.user?.sub, 
+                targetUserId: id 
+            });
             const user = await UserModel.findById(id).lean();
-            console.log('📊 Found user:', user ? 'yes' : 'no');
+            logGraphQL('GraphQL user query completed', { 
+                userId: ctx.user?.sub,
+                targetUserId: id,
+                found: !!user 
+            });
             return user;
         } catch (error) {
-            console.error('❌ Error in user query:', error);
+            logError('Error in user query', error as Error, { 
+                userId: ctx.user?.sub,
+                targetUserId: id 
+            });
             throw error;
         }
     },
