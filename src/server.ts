@@ -11,14 +11,23 @@ import { attachGraphQL, register404Handler } from "./graphql";
 // Redis
 import { redisClient, connectRedis } from "./redis/redis";
 
+// Logging
+import { logger } from "./utils/logger";
+import { httpLogger } from "./middleware/httpLogger";
+
+
+
 async function start() {
     await mongoose.connect(process.env.MONGO_URI!);
-    console.log('\n... ✅ Connected to MongoDB')
+    logger.info('Connected to MongoDB')
 
     await connectRedis();
   
     const app = createApp();
     const httpServer = http.createServer(app);
+  
+    // Attach HTTP logger BEFORE GraphQL
+    app.use(httpLogger);
   
     // Attach GraphQL BEFORE 404 handler
     await attachGraphQL(app, httpServer);
@@ -28,8 +37,8 @@ async function start() {
   
     const PORT = Number(process.env.PORT) || 4000;
     httpServer.listen(PORT, () => {
-      console.log(`... 🚀 REST ready at http://localhost:${PORT}`);
-      console.log(`... ⚙️ GraphQL ready at http://localhost:${PORT}/graphql`);
+      logger.info(`... 🚀 REST ready at http://localhost:${PORT}`);
+      logger.info(`... ⚙️ GraphQL ready at http://localhost:${PORT}/graphql`);
     });
   
     // Graceful shutdown
@@ -51,6 +60,6 @@ async function start() {
   }
   
   start().catch((e) => {
-    console.error("Fatal startup error:", e);
+    logger.error("Fatal startup error:", { error: e });
     process.exit(1);
   });

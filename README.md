@@ -41,15 +41,13 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 
 ### **WORK IN PROGRESS**:
 
-tbd
-
-### **BACKLOG**:
-
 - **v0.0.13** - Winston
     - Request/response logging
     - Performance metrics
     - Error tracking
     - Rate limit events
+
+### **BACKLOG**:
 
 - **tbd** - Caching (Redis-based)
     - Cache similar user queries (24h TTL)
