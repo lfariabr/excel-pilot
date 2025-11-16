@@ -27,14 +27,15 @@ Centralized Winston logger with:
 ### Log Categories
 ```typescript
 enum LogCategory {
-  SERVER      // Server lifecycle, startup, shutdown
-  DATABASE    // MongoDB operations, connections
-  AUTH        // Login, registration, JWT validation
-  OPENAI      // API calls, token usage, costs
-  RATE_LIMIT  // Rate limit hits, budget exhaustion
-  REDIS       // Cache operations, connections
-  GRAPHQL     // GraphQL queries and mutations
-  REST        // REST API requests
-  PERFORMANCE // Operation timing, bottlenecks
-  SECURITY    // Unauthorized access, suspicious activity
+  SERVER = 'server',          // Server lifecycle, startup, shutdown
+  DATABASE = 'database',      // MongoDB operations, connections
+  AUTH = 'auth',              // Login, registration, JWT validation
+  OPENAI = 'openai',          // API calls, token usage, costs
+  RATE_LIMIT = 'rate_limit',  // Rate limit hits, budget exhaustion
+  REDIS = 'redis',            // Cache operations, connections
+  GRAPHQL = 'graphql',        // GraphQL queries and mutations
+  REST = 'rest',              // REST API requests
+  PERFORMANCE = 'performance',// Operation timing, bottlenecks
+  SECURITY = 'security',      // Unauthorized access, suspicious activity
 }
+```

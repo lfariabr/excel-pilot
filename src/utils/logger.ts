@@ -12,20 +12,6 @@
  * - Rate limit event logging
  */
 
-/**
- * Production-Grade Winston Logger
- * 
- * Features:
- * - Structured JSON logging for production
- * - Pretty console logging for development
- * - Daily rotating file transports
- * - Separate error log files
- * - Performance tracking
- * - Request/response logging
- * - OpenAI API call tracking
- * - Rate limit event logging
- */
-
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
@@ -254,13 +240,15 @@ export const logPerformance = (
   success: boolean,
   metadata?: Record<string, any>
 ) => {
-  const level = duration > 1000 ? 'warn' : 'info'; // Warn if >1s
-  logger[level](`Performance: ${operation}`, {
+  const level: LogLevel.WARN | LogLevel.INFO =
+  duration > 1000 ? LogLevel.WARN : LogLevel.INFO;
+
+  logger.log(level, `Performance: ${operation}`, {
     category: LogCategory.PERFORMANCE,
     duration,
     success,
     ...metadata,
-  });
+});
 };
 
 /**

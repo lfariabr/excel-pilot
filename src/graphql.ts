@@ -4,6 +4,7 @@
 import http from "http";
 import express from "express";
 import { expressMiddleware } from "@as-integrations/express5";
+import { logError, logHTTP } from "./utils/logger";
 
 // GraphQL
 import { typeDefs } from "./schemas/typeDefs";
@@ -38,7 +39,13 @@ export async function attachGraphQL(
         : ApolloServerPluginLandingPageProductionDefault({ footer: false }),
     ],
     formatError: (formattedErr, rawErr) => {
-      // Log rawErr to pino/Datadog
+      // Log GraphQL errors
+      logError('GraphQL Error', rawErr as Error, {
+        message: formattedErr.message,
+        code: formattedErr.extensions?.code as string,
+        path: formattedErr.path?.join('.'),
+      });
+      
       if (process.env.NODE_ENV === "production") { // don't leak stack traces in production
         return { 
           message: formattedErr.message, 
@@ -83,9 +90,11 @@ export async function attachGraphQL(
  */
 export function register404Handler(app: express.Express) {
   app.use((_req: express.Request, res: express.Response) => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("404 Not Found:", _req.path);
-    }
+    logHTTP('404 Not Found', {
+      path: _req.path,
+      method: _req.method,
+      statusCode: 404
+    });
     res.status(404).json({ error: "Not found" });
   });
 }
