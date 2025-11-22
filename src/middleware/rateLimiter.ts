@@ -2,6 +2,7 @@ import { redisClient } from '../redis/redis';
 import { rateLimitConfig } from '../config/rateLimit.config';
 import { RateLimitResult } from '../schemas/types/rateLimitTypes';
 import { rateLimiterHealth } from './rateLimiterHealth';
+import { logRateLimit, logError } from '../utils/logger';
 
 // Load Lua scripts
 import { loadLuaScript } from '../redis/loadScript';
@@ -24,7 +25,11 @@ export class UserRateLimiter {
 
         // Check circuit state first
         if (rateLimiterHealth.isCircuitOpen()) {
-            console.warn(`⚠️ Circuit open: Denying ${limitType} request (fail-closed strategy)`);
+            logRateLimit('Circuit open: Denying request (fail-closed strategy)', {
+                userId,
+                limitType,
+                strategy: 'fail-closed'
+            });
             return {
                 allowed: false,
                 remaining: 0,
@@ -48,6 +53,15 @@ export class UserRateLimiter {
 
             if (newCount > config.max) {
                 const safeTTL = Number.isFinite(ttl) && ttl > 0 ? ttl : Math.floor(config.windowMs / 1000);
+                
+                logRateLimit('Rate limit exceeded', {
+                    userId,
+                    limitType,
+                    currentCount: newCount,
+                    maxAllowed: config.max,
+                    resetIn: safeTTL
+                });
+                
                 return {
                     allowed: false,
                     remaining: 0,
@@ -63,7 +77,11 @@ export class UserRateLimiter {
             };
 
         } catch (error) {
-            console.error('Rate limiter error:', error);
+            logError('Rate limiter error', error as Error, {
+                userId,
+                limitType,
+                strategy: 'fail-closed'
+            });
             // FAIL-CLOSED STRATEGY: Deny requests when Redis is unavailable
             // Rationale: Rate limiting is a SECURITY control that prevents abuse.
             // When tracking fails, we deny to prevent unlimited requests that could:
@@ -103,7 +121,11 @@ export class UserRateLimiter {
         
         // Check circuit state first
         if (rateLimiterHealth.isCircuitOpen()) {
-            console.warn(`⚠️ Circuit open: Allowing token budget request (fail-open strategy)`);
+            logRateLimit('Circuit open: Allowing token budget request (fail-open strategy)', {
+                userId,
+                tokensRequested: tokensToUse,
+                strategy: 'fail-open'
+            });
             return {
                 allowed: true,
                 remaining: dailyLimit,
@@ -148,6 +170,18 @@ export class UserRateLimiter {
                 ? 'monthly'
                 : 'none';
 
+                logRateLimit('Token budget exceeded', {
+                    userId,
+                    tokensRequested: tokensToUse,
+                    dailyUsed: newDaily,
+                    monthlyUsed: newMonthly,
+                    dailyLimit,
+                    monthlyLimit,
+                    exceededDaily,
+                    exceededMonthly,
+                    source
+                });
+
                 return {
                     allowed: false,
                     remaining: Math.min(
@@ -171,7 +205,11 @@ export class UserRateLimiter {
             }
 
         } catch (error) {
-            console.error('Token budget error:', error);
+            logError('Token budget error', error as Error, {
+                userId,
+                tokensRequested: tokensToUse,
+                strategy: 'fail-open'
+            });
             // FAIL-OPEN STRATEGY: Allow requests when Redis is unavailable
             // Rationale: Token budget is a COST CONTROL that tracks OpenAI API usage.
             // When tracking fails, we allow to prioritize USER EXPERIENCE over cost.
