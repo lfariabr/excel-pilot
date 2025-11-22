@@ -1,3 +1,5 @@
+import { logRateLimit, logError } from '../utils/logger';
+
 export class RateLimiterHealth {
     private failures = 0;
     private lastFailureTime = 0;
@@ -23,7 +25,12 @@ export class RateLimiterHealth {
         this.failures++;
         this.lastFailureTime = now;
 
-        console.error(`Redis failure recorded for ${operation}. Failures: ${this.failures}/${this.failureThreshold}`);
+        logRateLimit(`Redis failure recorded for ${operation}`, {
+            operation,
+            failures: this.failures,
+            threshold: this.failureThreshold,
+            willOpenCircuit: this.failures >= this.failureThreshold
+        });
 
         if (this.failures >= this.failureThreshold) {
             this.openCircuit();
@@ -35,7 +42,10 @@ export class RateLimiterHealth {
      */
     recordSuccess(): void {
         if (this.circuitState === 'half-open') {
-            console.log('✅ Circuit breaker: Redis recovered, closing circuit');
+            logRateLimit('Circuit breaker: Redis recovered, closing circuit', {
+                previousState: 'half-open',
+                newState: 'closed'
+            });
             this.closeCircuit();
         }
 
@@ -48,7 +58,11 @@ export class RateLimiterHealth {
     private openCircuit(): void {
         if (this.circuitState !== 'open'){
             this.circuitState = 'open';
-            console.error('🔴 CIRCUIT BREAKER OPEN - Redis unavailable, using fallback strategies');
+            logError('Circuit breaker opened - Redis unavailable', new Error('Redis circuit breaker triggered'), {
+                failures: this.failures,
+                threshold: this.failureThreshold,
+                strategy: 'Using fallback strategies'
+            });
 
             // Clear any existing timer before creating a new one
             if (this.halfOpenTimer) {
@@ -58,7 +72,11 @@ export class RateLimiterHealth {
             // Schedule transition to halfOpen after delay
             this.halfOpenTimer = setTimeout(() => {
                 this.circuitState = 'half-open';
-                console.warn('🟡 Circuit breaker HALF-OPEN - Testing Redis recovery');
+                logRateLimit('Circuit breaker half-open - Testing Redis recovery', {
+                    previousState: 'open',
+                    newState: 'half-open',
+                    delayMs: this.halfOpenDelayMs
+                });
                 this.halfOpenTimer = undefined;
             }, this.halfOpenDelayMs);
         }
