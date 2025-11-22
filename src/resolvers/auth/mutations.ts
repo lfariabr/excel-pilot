@@ -12,7 +12,7 @@ export const authMutations = {
 
             logAuth('Registration attempt', { 
                 email,
-                role: role || 'casual'
+                role: role
             });
 
             const exists = await UserModel.findOne({ email });
@@ -29,7 +29,7 @@ export const authMutations = {
                 });
             }
 
-            const user = await UserModel.create({ name, email, password, role: role || "casual" });
+            const user = await UserModel.create({ name, email, password, role: role });
             const accessToken = signAccessToken({
                 sub: user.id,
                 role: user.role,

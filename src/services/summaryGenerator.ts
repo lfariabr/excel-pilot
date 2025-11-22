@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { askOpenAI } from '../services/openAi';
 import Conversation from '../models/Conversation';
 import Message from '../models/Message';
+import { logOpenAI, logError } from '../utils/logger';
 
 export async function generateConversationSummary(
     messages: any,
@@ -39,7 +40,9 @@ export async function generateConversationSummary(
 
         return summary;
     } catch (error) {
-        console.error('Error generating conversation summary:', error);
+        logError('Error generating conversation summary', error as Error, {
+            messagesCount: messages?.length || 0
+        });
         return "Error generating summary";
     }
 }
@@ -54,9 +57,15 @@ export async function updateConversationSummary(
             { summary },
             { new: true },
         );
-        console.log(`✅ Summary updated for conversation ${conversationId}: "${summary}"`);
+        logOpenAI('Summary updated for conversation', {
+            conversationId,
+            summaryLength: summary.length
+        });
     } catch (error) {
-        console.error(`❌ Error updating summary for conversation ${conversationId}: ${error}`);
+        logError('Error updating summary for conversation', error as Error, {
+            conversationId,
+            summaryLength: summary.length
+        });
         // we don't throw error because this shouldn't break the chat
     }
 }

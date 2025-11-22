@@ -2,6 +2,7 @@
 import OpenAI from "openai";
 import briefing from "../data/briefing.json";
 import { GraphQLError } from "graphql";
+import { logOpenAI, logError } from "../utils/logger";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -37,6 +38,8 @@ export async function askOpenAI({
   maxOutputTokens?: number;
 }) {
   try {
+    const startTime = Date.now();
+    
     // Build contextual instructions from history
     let contextualInstructions = getSystemPrompt();
 
@@ -56,6 +59,19 @@ export async function askOpenAI({
       max_output_tokens: maxOutputTokens,
     });
     
+    const duration = Date.now() - startTime;
+    
+    // Log successful OpenAI API call
+    logOpenAI('OpenAI API call completed', {
+      model: response.model ?? model,
+      inputTokens: response.usage?.input_tokens,
+      outputTokens: response.usage?.output_tokens,
+      totalTokens: response.usage?.total_tokens,
+      duration,
+      finishReason: (response as any).finish_reason,
+      historyLength: history.length
+    });
+    
     return {
       text: response.output_text ?? "",
       usage: response.usage ? {
@@ -68,7 +84,14 @@ export async function askOpenAI({
     };
 
   } catch (error) {
-    console.error("OpenAI Responses API error:", error);
+    logError('OpenAI API error', error as Error, {
+      model,
+      temperature,
+      maxOutputTokens,
+      historyLength: history.length,
+      userMessageLength: userMessage.length
+    });
+    
     throw new GraphQLError("Failed to get response from OpenAI", {
       extensions: {
         code: "OPENAI_ERROR",
