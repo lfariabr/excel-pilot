@@ -1,6 +1,8 @@
 # ExcelPilot
 
-Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, Express.js, Apollo Server, MongoDB, Redis and OpenAI.
+This project is an API to allow non-technical users to *login*, *create conversations threads*, *send messages* and get *responses* from OpenAI's specialized agents. Features rate limiting, token budget, circuit breaker, analytics and an extensive testing suite (+200 tests).
+
+It uses *Node.js*, *Express.js*, *Apollo Server*, *MongoDB*, *Redis*, *Jest*, *Docker*, *Winston* and *OpenAI*.
 
 ![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/lfariabr/excel-pilot)
 
@@ -21,7 +23,7 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 | Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ |
 | Jest + Testing | ✅ | _v0.0.11_ |
 | Docker | ✅ | _v0.0.12_ |
-| Winston | ⏳ | _v0.0.13_ |
+| Winston | 🔥 | _v0.0.13_ |
 
 ## **Detailed Changelog** 
 
@@ -38,19 +40,18 @@ Building an API to guide ExcelBM Concierges on their daily tasks using Node.js, 
 - **v0.0.10** - Rate Limit (Circuit Breaker, Analytics, Tiered Limits)
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
 - **v0.0.12** - Docker: Containerized with multi-stage build, Docker Compose
-- **v0.0.13** - Winston: Production-grade logging system
 
 ### **WORK IN PROGRESS**:
 
-tbd
+- **v0.0.13** - Winston: Production-grade logging system
 
 ### **BACKLOG**:
 
+- **tbd** - AI Agent: Natural language processing, intent recognition, context awareness, conversation history
 - **tbd** - Caching (Redis-based)
     - Cache similar user queries (24h TTL)
     - Cache conversation context
     - Cache system prompts and briefing data
-
 - **tbd** - Jenkins
 - **tbd** - Monitoring and Alerting (Prometheus, Grafana)
 - **tbd** - CI/CD (GitHub Actions)

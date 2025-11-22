@@ -1,5 +1,7 @@
 import UserModel from "../../models/User";
 import { requireAuth, requireRole } from "../../utils/guards";
+import { logGraphQL, logAuth, logError } from "../../utils/logger";
+import mongoose from "mongoose";
 
 export const usersMutation = {
 
@@ -17,12 +19,16 @@ export const usersMutation = {
             role: string 
         }) => {
         try {
-            console.log('🔍 GraphQL createUser called with:', { name, email, role });
+            logGraphQL('GraphQL createUser called', { name, email, role });
             const user = await UserModel.create({ name, email, role });
-            console.log('✅ User created:', user?._id);
+            logAuth('User created successfully', {
+                userId: (user._id as mongoose.Types.ObjectId).toString() as string,
+                email,
+                role
+            });
             return user;
         } catch (error) {
-            console.error('❌ Error creating user:', error);
+            logError('Error creating user', error as Error, { name, email, role });
             throw error;
         }
     },
@@ -40,16 +46,26 @@ export const usersMutation = {
         }, ctx: any) => {
         try {
             requireAuth(ctx);
-            console.log('🔍 GraphQL updateUser called with:', { id, name, email, role });
+            logGraphQL('GraphQL updateUser called', { 
+                userId: ctx.user?.sub,
+                targetUserId: id,
+                updates: { name, email, role } 
+            });
             const user = await UserModel.findByIdAndUpdate(
                 id, 
                 { name, email, role }, 
                 { new: true }
             );
-            console.log('✅ User updated:', user?._id);
+            logAuth('User updated successfully', {
+                userId: ctx.user?.sub,
+                targetUserId: id
+            });
             return user;
         } catch (error) {
-            console.error('❌ Error updating user:', error);
+            logError('Error updating user', error as Error, { 
+                userId: ctx.user?.sub,
+                targetUserId: id 
+            });
             throw error;
         }
     },
@@ -57,14 +73,23 @@ export const usersMutation = {
     // delete user
     deleteUser: async (_: any, { id }: { id: string }, ctx: any) => {
         try {
-            console.log('Checking auth...')
             requireRole(ctx, ["admin"]);
-            console.log('🔍 GraphQL deleteUser called with id:', id);
+            logAuth('Admin attempting to delete user', {
+                userId: ctx.user?.sub,
+                targetUserId: id,
+                role: ctx.user?.role
+            });
             const user = await UserModel.findByIdAndDelete(id);
-            console.log('✅ User deleted:', user?._id);
+            logAuth('User deleted successfully', {
+                userId: ctx.user?.sub,
+                targetUserId: id
+            });
             return user;
         } catch (error) {
-            console.error('❌ Error deleting user:', error);
+            logError('Error deleting user', error as Error, { 
+                userId: ctx.user?.sub,
+                targetUserId: id 
+            });
             throw error;
         }
     },

@@ -39,3 +39,32 @@ enum LogCategory {
   SECURITY = 'security',      // Unauthorized access, suspicious activity
 }
 ```
+
+### Task Breakdown
+- [X] Structured logging with multiple transports (console, daily rotating files)
+  - [X] Console transport (development)
+  - [X] Combined file transport (info level, 14-day retention)
+  - [X] Error file transport (error level, 30-day retention)
+  - [X] HTTP file transport (http level, 7-day retention)
+- [X] HTTP request/response logging with middleware
+  - [X] Development: Pretty, colorized console output
+  - [X] Production: Structured JSON for log aggregation tools
+- [ ] OpenAI API call tracking with token usage and cost estimation
+- [ ] Rate limit event logging and circuit breaker monitoring
+- [ ] Performance metrics and execution time tracking
+- [X] Error tracking with full stack traces and context
+  - [X] Error file transport (error level, 30-day retention)
+- [X] Specialized loggers for specifics auth, database, Redis, GraphQL operations
+- [ ] Individually specialized loggers for each operation
+  - [X] Auth (`src/resolvers/auth`)
+  - [X] Users (`src/resolvers/users`)
+  - [X] Redis (`src/redis/redis.ts`)
+    - [ ] Rate limit (`src/middleware/rateLimiter.ts`)
+    - [ ] Rate limit health (`src/middleware/rateLimiterHealth.ts`)
+  - [ ] Conversations (`src/resolvers/conversations`)
+  - [ ] Messages (`src/resolvers/messages`)
+  - [X] Database (MongoDB @ `server.ts`)
+  - [X] GraphQL (Apollo @ `graphql.ts`)
+- [ ] REST 
+  - [ ] Routes (`src/routes`)
+- [ ] Log rotation (14-day combined, 30-day errors, 7-day HTTP)
