@@ -2,10 +2,13 @@
 // npm test -- src/__tests__/conversations/Conversation.test.ts
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import Conversation from '../../models/Conversation';
+
 import UserModel from '../../models/User';
 import Message from '../../models/Message';
+import Conversation from '../../models/Conversation';
+
 import { generateConversationTitle } from '../../services/titleGenerator';
+import { generateConversationSummary } from '../../services/summaryGenerator';
 
 // Mock the OpenAI service to avoid actual API calls
 jest.mock('../../services/openAi');
@@ -330,6 +333,132 @@ describe('Conversation Model', () => {
         expect(title).toBe('Services Overview Discussion');
         expect(title.length).toBeLessThanOrEqual(50);
         expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    describe('Summary Generation', () => {
+      it('should generate a summary for Excel-related conversation', async () => {
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'User asked about creating pivot tables in Excel. Assistant provided step-by-step instructions on selecting data range and using the PivotTable feature.',
+          usage: { input_tokens: 150, output_tokens: 30, total_tokens: 180 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
+
+        const messages = [
+          { role: 'user', content: 'How do I create a pivot table in Excel?' },
+          { role: 'assistant', content: 'To create a pivot table in Excel, select your data range, go to Insert > PivotTable, choose your data source and location, then drag fields to the appropriate areas.' }
+        ];
+
+        const summary = await generateConversationSummary(messages);
+
+        expect(summary).toBe('User asked about creating pivot tables in Excel. Assistant provided step-by-step instructions on selecting data range and using the PivotTable feature.');
+        expect(typeof summary).toBe('string');
+        expect(summary.length).toBeGreaterThan(0);
+        expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+        expect(mockAskOpenAI).toHaveBeenCalledWith(
+          expect.objectContaining({
+            model: 'gpt-4o-mini',
+            maxOutputTokens: 200,
+            temperature: 0.3,
+            history: [], // Should pass empty history
+          })
+        );
+      });
+
+      it('should generate a summary for Sydney Opera House conversation', async () => {
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'User inquired about weekend performances. Assistant provided information about current shows including opera, ballet, and concerts.',
+          usage: { input_tokens: 140, output_tokens: 25, total_tokens: 165 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
+
+        const messages = [
+          { role: 'user', content: 'What shows are playing this weekend?' },
+          { role: 'assistant', content: 'This weekend features several shows including opera, ballet, and concerts. For specific showtimes and tickets, please check our website.' }
+        ];
+
+        const summary = await generateConversationSummary(messages);
+
+        expect(summary).toBeDefined();
+        expect(typeof summary).toBe('string');
+        expect(summary.length).toBeGreaterThan(0);
+        expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+      });
+
+      it('should return fallback summary for empty messages array', async () => {
+        const summary = await generateConversationSummary([]);
+
+        expect(summary).toBe('No summary available');
+        expect(mockAskOpenAI).not.toHaveBeenCalled();
+      });
+
+      it('should return fallback summary for null messages', async () => {
+        const summary = await generateConversationSummary(null);
+
+        expect(summary).toBe('No summary available');
+        expect(mockAskOpenAI).not.toHaveBeenCalled();
+      });
+
+      it('should handle long multi-turn conversations', async () => {
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'Comprehensive discussion about Excel features, formulas, and data analysis techniques spanning multiple topics.',
+          usage: { input_tokens: 250, output_tokens: 40, total_tokens: 290 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
+
+        const messages = [
+          { role: 'user', content: 'How do I use VLOOKUP?' },
+          { role: 'assistant', content: 'VLOOKUP searches for a value in the first column...' },
+          { role: 'user', content: 'What about pivot tables?' },
+          { role: 'assistant', content: 'Pivot tables allow you to summarize large datasets...' },
+          { role: 'user', content: 'Can I combine both?' },
+          { role: 'assistant', content: 'Yes, you can use VLOOKUP to prepare data before creating a pivot table.' }
+        ];
+
+        const summary = await generateConversationSummary(messages);
+
+        expect(summary).toBeDefined();
+        expect(summary.length).toBeGreaterThan(0);
+        expect(summary.length).toBeLessThanOrEqual(500);
+        expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+      });
+
+      it('should properly format messages in the prompt', async () => {
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'Test summary',
+          usage: { input_tokens: 100, output_tokens: 10, total_tokens: 110 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
+
+        const messages = [
+          { role: 'user', content: 'First message' },
+          { role: 'assistant', content: 'First response' }
+        ];
+
+        await generateConversationSummary(messages);
+
+        // Verify the prompt includes formatted conversation text
+        const callArgs = mockAskOpenAI.mock.calls[0][0];
+        expect(callArgs.userMessage).toContain('USER: First message');
+        expect(callArgs.userMessage).toContain('ASSISTANT: First response');
+        expect(callArgs.userMessage).toContain('Summarize this conversation');
+      });
+
+      it('should return error message when OpenAI fails', async () => {
+        mockAskOpenAI.mockRejectedValueOnce(new Error('OpenAI API error'));
+
+        const messages = [
+          { role: 'user', content: 'Test message' },
+          { role: 'assistant', content: 'Test response' }
+        ];
+
+        const summary = await generateConversationSummary(messages);
+
+        expect(summary).toBe('Error generating summary');
       });
     });
 });
