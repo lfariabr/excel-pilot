@@ -55,7 +55,7 @@ enum LogCategory {
 - [X] Error tracking with full stack traces and context
   - [X] Error file transport (error level, 30-day retention)
 - [X] Specialized loggers for specifics auth, database, Redis, GraphQL operations
-- [ ] Individually specialized loggers for each operation
+- [X] Individually specialized loggers for each operation
   - [X] Auth (`src/resolvers/auth`)
   - [X] Users (`src/resolvers/users`)
   - [X] Redis (`src/redis/redis.ts`)
@@ -65,8 +65,10 @@ enum LogCategory {
   - [X] Messages (`src/resolvers/messages`)
   - [X] Database (MongoDB @ `server.ts`)
   - [X] GraphQL (Apollo @ `graphql.ts`)
-- [ ] REST 
-  - [ ] Routes (`src/routes`)
+- [X] REST 
+  - [X] Routes (`src/routes`)
+    - [X] User CRUD (`src/routes/user.ts`)
+    - [X] Rate limit analytics (`src/routes/rateLimiterLogs.ts`)
 - [ ] Log rotation (14-day combined, 30-day errors, 7-day HTTP)
 - [ ] Add background job monitoring
 
