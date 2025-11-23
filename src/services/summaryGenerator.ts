@@ -8,25 +8,29 @@ export async function generateConversationSummary(
     messages: any,
 ): Promise<string> {
     // Validate inputs before making API call
-    if (!messages || (typeof messages === 'string' && !messages.trim()) || (Array.isArray(messages) && messages.length === 0)) {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
         return "No summary available";
     }
 
     try {
-        // Combine messages into a single prompt for summary generation
+        // Format messages into readable conversation text
+        const conversationText = messages
+            .map(m => `${m.role.toUpperCase()}: ${m.content}`)
+            .join('\n\n');
+
         const summaryPrompt = `Summarize this conversation in 2-3 sentences focusing on:
         1. Main topics discussed
         2. User's key questions/goals
         3. Important outcomes or decisions
 
         Conversation:
-        ${messages}
+        ${conversationText}
 
         Summary (50-100 words):`;
 
         const response = await askOpenAI({
             userMessage: summaryPrompt,
-            history: messages, // no history needed for summary generation
+            history: [], // Pass empty history since conversation context is in the prompt
             model: "gpt-4o-mini", // cheapest model
             maxOutputTokens: 200, // short summaries
             temperature: 0.3, // less creative, more concise
