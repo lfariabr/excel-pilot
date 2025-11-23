@@ -7,6 +7,10 @@ export async function generateConversationTitle(
     userMessage: string,
     aiResponse: string,
 ): Promise<string> {
+    // Validate inputs before making API call
+    if (!userMessage?.trim() || !aiResponse?.trim()) {
+        return "New Conversation";
+    }
     // 1. Create optimized prompt for title generation
     // 2. Call OpenAI with specific settings for titles
     // 3. Clean and validate the response
