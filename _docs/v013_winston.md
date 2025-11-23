@@ -49,8 +49,8 @@ enum LogCategory {
 - [X] HTTP request/response logging with middleware
   - [X] Development: Pretty, colorized console output
   - [X] Production: Structured JSON for log aggregation tools
-- [ ] OpenAI API call tracking with token usage and cost estimation
-- [ ] Rate limit event logging and circuit breaker monitoring
+- [X] OpenAI API call tracking with token usage and cost estimation
+- [X] Rate limit event logging and circuit breaker monitoring
 - [ ] Performance metrics and execution time tracking
 - [X] Error tracking with full stack traces and context
   - [X] Error file transport (error level, 30-day retention)
@@ -61,10 +61,27 @@ enum LogCategory {
   - [X] Redis (`src/redis/redis.ts`)
     - [X] Rate limit (`src/middleware/rateLimiter.ts`)
     - [X] Rate limit health (`src/middleware/rateLimiterHealth.ts`)
-  - [ ] Conversations (`src/resolvers/conversations`)
-  - [ ] Messages (`src/resolvers/messages`)
+  - [X] Conversations (`src/resolvers/conversations`)
+  - [X] Messages (`src/resolvers/messages`)
   - [X] Database (MongoDB @ `server.ts`)
   - [X] GraphQL (Apollo @ `graphql.ts`)
 - [ ] REST 
   - [ ] Routes (`src/routes`)
 - [ ] Log rotation (14-day combined, 30-day errors, 7-day HTTP)
+- [ ] Add background job monitoring
+
+```bash
+# Examples
+# 1- Title generation success rate
+total_title_attempts=$(grep -E "(Title updated|Error.*title)" logs/combined-*.log | wc -l)
+successful_titles=$(grep "Title updated for conversation" logs/combined-*.log | wc -l)
+echo "Title success rate: $((successful_titles * 100 / total_title_attempts))%"
+
+# 2- Summary generation success rate
+total_summary_attempts=$(grep -E "(Summary updated|Error.*summary)" logs/combined-*.log | wc -l)
+successful_summaries=$(grep "Summary updated for conversation" logs/combined-*.log | wc -l)
+echo "Summary success rate: $((successful_summaries * 100 / total_summary_attempts))%"
+
+# 3- Average summary length
+grep "Summary updated for conversation" logs/combined-*.log | jq -r '.summaryLength' | awk '{sum+=$1; count++} END {print "Avg summary length:", sum/count, "chars"}'
+```

@@ -1,7 +1,9 @@
 // src/services/openai.ts
 import OpenAI from "openai";
 import briefing from "../data/briefing.json";
+import swharf from "../data/swharf.json";
 import { GraphQLError } from "graphql";
+import { logOpenAI, logError } from "../utils/logger";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
@@ -9,7 +11,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 let cachedSystemPrompt: string | null = null;
 export function getSystemPrompt(): string {
   if(!cachedSystemPrompt){
-    const briefingText = JSON.stringify(briefing, null, 2);
+    const briefingText = JSON.stringify(swharf, null, 2);
     cachedSystemPrompt = `You are Excel's BM Concierge Personal Assistant.
 Follow these rules and only answer using this knowledge base (respond in Markdown, concise sections/bullets):
 
@@ -37,6 +39,8 @@ export async function askOpenAI({
   maxOutputTokens?: number;
 }) {
   try {
+    const startTime = Date.now();
+    
     // Build contextual instructions from history
     let contextualInstructions = getSystemPrompt();
 
@@ -56,6 +60,19 @@ export async function askOpenAI({
       max_output_tokens: maxOutputTokens,
     });
     
+    const duration = Date.now() - startTime;
+    
+    // Log successful OpenAI API call
+    logOpenAI('OpenAI API call completed', {
+      model: response.model ?? model,
+      inputTokens: response.usage?.input_tokens,
+      outputTokens: response.usage?.output_tokens,
+      totalTokens: response.usage?.total_tokens,
+      duration,
+      finishReason: (response as any).finish_reason,
+      historyLength: history.length
+    });
+    
     return {
       text: response.output_text ?? "",
       usage: response.usage ? {
@@ -68,7 +85,14 @@ export async function askOpenAI({
     };
 
   } catch (error) {
-    console.error("OpenAI Responses API error:", error);
+    logError('OpenAI API error', error as Error, {
+      model,
+      temperature,
+      maxOutputTokens,
+      historyLength: history.length,
+      userMessageLength: userMessage.length
+    });
+    
     throw new GraphQLError("Failed to get response from OpenAI", {
       extensions: {
         code: "OPENAI_ERROR",

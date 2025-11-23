@@ -1,5 +1,5 @@
 // __tests__/messages/Mutations.test.ts
-
+// npm test -- src/__tests__/messages/Mutations.test.ts
 // Set dummy OpenAI API key for tests (required before imports)
 process.env.OPENAI_API_KEY = 'test-api-key';
 
@@ -548,16 +548,32 @@ describe('Message Mutations', () => {
     });
 
     it('should adjust token budget if actual usage exceeds estimate', async () => {
-      // Mock underestimation scenario
+      // Clear previous mock behavior
+      (userRateLimiter.checkUserTokenBudget as jest.Mock).mockClear();
+      
+      // Mock underestimation scenario with HIGH actual tokens
       (askOpenAI as jest.Mock).mockResolvedValue({
         text: 'AI response',
         model: 'gpt-4',
         usage: {
-          input_tokens: 100,  // Much higher than typical estimate
-          output_tokens: 200,
-          total_tokens: 300
+          input_tokens: 400,  // Much higher than estimate for "Hi"
+          output_tokens: 600,
+          total_tokens: 1000
         }
       });
+
+      // Mock successful adjustment - both calls pass
+      (userRateLimiter.checkUserTokenBudget as jest.Mock)
+        .mockResolvedValueOnce({
+          allowed: true,
+          remaining: 49000,
+          resetTime: Date.now() + 86400000
+        })
+        .mockResolvedValueOnce({
+          allowed: true,
+          remaining: 48000,
+          resetTime: Date.now() + 86400000
+        });
 
       const ctx = {
         user: {
@@ -569,20 +585,66 @@ describe('Message Mutations', () => {
 
       await messagesMutation.sendMessage(
         null,
-        { conversationId: testConversationId.toString(), content: 'Short message' },
+        { conversationId: testConversationId.toString(), content: 'Hi' },  // Very short = low estimate
         ctx
       );
 
       // Verify token budget was checked twice:
-      // 1. Initial check with estimated tokens
-      // 2. Adjustment call when actual > estimated
+      // 1. Initial check with estimated tokens (~300 for "Hi")
+      // 2. Adjustment call when actual (1000) > estimated (~300)
       const calls = (userRateLimiter.checkUserTokenBudget as jest.Mock).mock.calls;
-      expect(calls.length).toBeGreaterThanOrEqual(1);
+      expect(calls.length).toBe(2);
       
-      // Verify second call happened with the difference
-      if (calls.length >= 2) {
-        expect(calls[1][1]).toBeGreaterThan(0); // Token difference
-      }
+      // Verify second call happened with the token difference
+      expect(calls[1][1]).toBeGreaterThan(0); // Token difference should be ~700
+    });
+
+    it('should not throw error when post-call adjustment exceeds budget', async () => {
+      // Mock scenario where actual tokens exceed estimate AND budget
+      (askOpenAI as jest.Mock).mockResolvedValue({
+        text: 'AI response',
+        model: 'gpt-4',
+        usage: {
+          input_tokens: 500,
+          output_tokens: 500,
+          total_tokens: 1000  // Much higher than estimate
+        }
+      });
+
+      // First call (pre-check) passes, second call (adjustment) fails
+      (userRateLimiter.checkUserTokenBudget as jest.Mock)
+        .mockResolvedValueOnce({
+          allowed: true,
+          remaining: 100,  // Very low remaining
+          resetTime: Date.now() + 86400000
+        })
+        .mockResolvedValueOnce({
+          allowed: false,  // Adjustment would exceed budget
+          remaining: 100,
+          resetTime: Date.now() + 86400000
+        });
+
+      const ctx = {
+        user: {
+          sub: testUserId.toString(),
+          role: 'casual',
+          email: 'test@example.com'
+        }
+      };
+
+      // Should NOT throw - response already generated
+      const result = await messagesMutation.sendMessage(
+        null,
+        { conversationId: testConversationId.toString(), content: 'Test' },
+        ctx
+      );
+
+      expect(result).toBeDefined();
+      expect(result.content).toBe('AI response');
+      
+      // Verify both calls happened
+      const calls = (userRateLimiter.checkUserTokenBudget as jest.Mock).mock.calls;
+      expect(calls.length).toBe(2);
     });
   });
 });

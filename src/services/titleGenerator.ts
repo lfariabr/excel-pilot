@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { askOpenAI } from '../services/openAi';
 import Conversation from '../models/Conversation';
+import { logOpenAI, logError } from '../utils/logger';
 
 export async function generateConversationTitle(
     userMessage: string,
@@ -40,7 +41,10 @@ export async function generateConversationTitle(
         return title;
 
     } catch (error) {
-        console.error("Error generating conversation title:", error);
+        logError('Error generating conversation title', error as Error, {
+            userMessageLength: userMessage.length,
+            aiResponseLength: aiResponse.length
+        });
         return "New Conversation";
     }
 }
@@ -57,9 +61,15 @@ export async function updateConversationTitle(
             { title },
             { new: true },
         );
-        console.log(`✅ Title updated for conversation ${conversationId}: "${title}"`);
+        logOpenAI('Title updated for conversation', {
+            conversationId,
+            title
+        });
     } catch (error) {
-        console.error(`❌ Error updating title for conversation ${conversationId}: ${error}`);
+        logError('Error updating title for conversation', error as Error, {
+            conversationId,
+            title
+        });
         // we don't throw error because this shouldn't break the chat
     }
 }

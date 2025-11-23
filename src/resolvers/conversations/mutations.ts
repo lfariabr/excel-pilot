@@ -4,6 +4,8 @@ import { requireAuth } from "../../utils/guards";
 import Message from "../../models/Message";
 import Conversation from "../../models/Conversation";
 
+import { logGraphQL, logOpenAI, logRateLimit, logError } from "../../utils/logger";
+
 import { formatTimestamp } from "../../utils/dateFormatter";
 import { TokenEstimator } from "../../utils/tokenEstimator";
 import { getSystemPrompt, askOpenAI } from "../../services/openAi";
@@ -20,20 +22,34 @@ export const conversationsMutation = {
             throw new GraphQLError("UNAUTHENTICATED");
         }
 
-        // Add after authentication, before calling askOpenAI:
-        const rateLimitResult = await userRateLimiter.checkUserLimit(
-            ctx.user.sub, 
-            'conversations'
-        );
-        if (!rateLimitResult.allowed) {
-            const userTier = ctx.user.plan || ctx.user.tier || ctx.user.subscription?.tier;
-            rateLimitAnalytics.logViolation(
-                ctx.user.sub,
-                'conversations',
-                userTier
+        try {
+            logGraphQL('GraphQL startConversation called', {
+                userId: ctx.user.sub,
+                contentLength: content.length
+            });
+
+            // Add after authentication, before calling askOpenAI:
+            const rateLimitResult = await userRateLimiter.checkUserLimit(
+                ctx.user.sub, 
+                'conversations'
             );
-            
-            throw new GraphQLError(
+            if (!rateLimitResult.allowed) {
+                const userTier = ctx.user.plan || ctx.user.tier || ctx.user.subscription?.tier;
+                rateLimitAnalytics.logViolation(
+                    ctx.user.sub,
+                    'conversations',
+                    userTier
+                );
+                
+                logRateLimit('Conversation rate limit exceeded', {
+                    userId: ctx.user.sub,
+                    limitType: 'conversations',
+                    remaining: rateLimitResult.remaining,
+                    resetTime: rateLimitResult.resetTime,
+                    userTier
+                });
+                
+                throw new GraphQLError(
                 `Rate limit exceeded. You can make ${rateLimitConfig.conversations.max} conversations per minute. ` +
                 `Try again in ${Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)} seconds.`,
                 {
@@ -54,6 +70,11 @@ export const conversationsMutation = {
         });
         await conversation.save();
 
+        logGraphQL('Conversation created', {
+            userId: ctx.user.sub,
+            conversationId: (conversation._id as any).toString()
+        });
+
         // Create user message
         const userMessage = await Message.create({
             conversationId: conversation._id,
@@ -69,6 +90,13 @@ export const conversationsMutation = {
             estimatedTokens
         );
         if (!budgetResult.allowed) {
+            logRateLimit('Token budget exceeded for conversation', {
+                userId: ctx.user.sub,
+                conversationId: (conversation._id as any).toString(),
+                estimatedTokens,
+                remaining: budgetResult.remaining
+            });
+            
             throw new GraphQLError(
                 `Daily token budget exceeded. Remaining: ${budgetResult.remaining} tokens. Resets in ${Math.ceil((budgetResult.resetTime - Date.now()) / (1000 * 60 * 60))} hours.`,
                 {
@@ -86,6 +114,59 @@ export const conversationsMutation = {
             userMessage: content,
             history: [],
         });
+
+        logOpenAI('OpenAI call for new conversation', {
+            userId: ctx.user.sub,
+            conversationId: (conversation._id as any).toString(),
+            estimatedTokens,
+            actualTokens: talkToOpenAI.usage?.total_tokens,
+            model: talkToOpenAI.model
+        });
+
+        // Adjust token budget based on actual usage
+        const actualTokens = TokenEstimator.getActualTokens(talkToOpenAI);
+        const tokenDifference = actualTokens - estimatedTokens;
+
+        if (tokenDifference > 0) {
+            logRateLimit('Adjusting token budget for underestimation', {
+                userId: ctx.user.sub,
+                conversationId: (conversation._id as any).toString(),
+                tokenDifference,
+                estimated: estimatedTokens,
+                actual: actualTokens
+            });
+            
+            // Check if adjustment would exceed budget
+            const adjustmentResult = await userRateLimiter.checkUserTokenBudget(
+                ctx.user.sub, 
+                tokenDifference
+            );
+            
+            if (!adjustmentResult.allowed) {
+                // Log budget breach (response already generated, can't undo)
+                logRateLimit('Token budget exceeded during post-call adjustment', {
+                    userId: ctx.user.sub,
+                    conversationId: (conversation._id as any).toString(),
+                    tokenDifference,
+                    estimated: estimatedTokens,
+                    actual: actualTokens,
+                    remaining: adjustmentResult.remaining,
+                    wouldNeedTotal: estimatedTokens + tokenDifference
+                });
+                // Note: We don't throw here because the AI response was already generated
+                // and the user received value. Budget is debited regardless.
+            }
+        } else if (tokenDifference < 0) {
+            // Overestimated - user was conservatively charged, which is acceptable
+            logRateLimit('Token budget overestimation (user conservatively charged)', {
+                userId: ctx.user.sub,
+                conversationId: (conversation._id as any).toString(),
+                tokenDifference: Math.abs(tokenDifference),
+                estimated: estimatedTokens,
+                actual: actualTokens
+            });
+            // Note: We don't refund overestimations as it provides a safety buffer
+        }
 
         // Persist assistant message
         const AIassistantMessage = await Message.create({
@@ -105,17 +186,33 @@ export const conversationsMutation = {
 
         // Generate title
         generateConversationTitle(content, talkToOpenAI.text)
-            .then(title => updateConversationTitle((conversation._id as any).toString(), title))
-            .catch(error => console.error("Error generating conversation title:", error));
+            .then(title => updateConversationTitle((conversation._id as any).toString(), title))            
 
         // Bump conversation timestamps
         await Conversation.updateOne({ _id: conversation._id }, { lastMessageAt: new Date() });
+
+        logGraphQL('Conversation started successfully', {
+            userId: ctx.user.sub,
+            conversationId: (conversation._id as any).toString(),
+            tokensUsed: actualTokens,
+            tokenDifference
+        });
 
         const messageObj = AIassistantMessage.toObject() as any;
         return {
             ...messageObj,
             id: messageObj._id.toString(),
             createdAt: formatTimestamp(messageObj.createdAt),
+        };
+        } catch (error) {
+            if (error instanceof GraphQLError) {
+                throw error; // Re-throw GraphQL errors (already logged)
+            }
+            logError('Error starting conversation', error as Error, {
+                userId: ctx.user.sub,
+                contentLength: content.length
+            });
+            throw error;
         }
     },
 };
