@@ -51,7 +51,17 @@ enum LogCategory {
   - [X] Production: Structured JSON for log aggregation tools
 - [X] OpenAI API call tracking with token usage and cost estimation
 - [X] Rate limit event logging and circuit breaker monitoring
-- [ ] Performance metrics and execution time tracking
+- [X] Performance metrics and execution time tracking
+  - What I have:
+    - ✅ HTTP request duration (via httpLogger middleware)
+    - ✅ Token usage tracking (OpenAI calls)
+    - ✅ Result counts (e.g., resultCount: 16 for list operations)
+    - ✅ Database operation context
+  - What could be added (optional):
+    - GraphQL resolver execution time
+    - Database query duration
+    - OpenAI API call latency breakdown
+    - Memory usage snapshots
 - [X] Error tracking with full stack traces and context
   - [X] Error file transport (error level, 30-day retention)
 - [X] Specialized loggers for specifics auth, database, Redis, GraphQL operations
@@ -69,8 +79,13 @@ enum LogCategory {
   - [X] Routes (`src/routes`)
     - [X] User CRUD (`src/routes/user.ts`)
     - [X] Rate limit analytics (`src/routes/rateLimiterLogs.ts`)
-- [ ] Log rotation (14-day combined, 30-day errors, 7-day HTTP)
-- [ ] Add background job monitoring
+- [X] Log rotation (14-day combined, 30-day errors, 7-day HTTP)
+  - Winston setup already has log rotation via `winston-daily-rotate-file` at `src/utils/logger.ts`
+- [X] Add background job monitoring
+  - Basic implementation: async operations with Winston logging
+  - Jobs: title generation, summary generation
+  - Queryable via log aggregation (see bash examples)
+  - Future: Can upgrade to Bull/BullMQ if needed
 
 ```bash
 # Examples
