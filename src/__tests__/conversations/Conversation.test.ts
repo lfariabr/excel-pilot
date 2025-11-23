@@ -7,6 +7,11 @@ import UserModel from '../../models/User';
 import Message from '../../models/Message';
 import { generateConversationTitle } from '../../services/titleGenerator';
 
+// Mock the OpenAI service to avoid actual API calls
+jest.mock('../../services/openAi');
+import { askOpenAI } from '../../services/openAi';
+const mockAskOpenAI = askOpenAI as jest.MockedFunction<typeof askOpenAI>;
+
 describe('Conversation Model', () => {
   let mongoServer: MongoMemoryServer;
   let testUserId: mongoose.Types.ObjectId;
@@ -29,6 +34,19 @@ describe('Conversation Model', () => {
       role: 'casual'
     });
     testUserId = user._id as mongoose.Types.ObjectId;
+
+    // Reset and setup mock for each test
+    mockAskOpenAI.mockReset();
+    mockAskOpenAI.mockResolvedValue({
+      text: 'Default Mock Response',
+      usage: {
+        input_tokens: 100,
+        output_tokens: 20,
+        total_tokens: 120,
+      },
+      model: 'gpt-4o-mini',
+      finishReason: 'stop',
+    });
   });
 
   afterEach(async () => {
@@ -247,47 +265,71 @@ describe('Conversation Model', () => {
 
     describe('Title generation', () => {
       it('should generate a title for Excel-related conversation', async () => {
-      const userMessage = 'How do I create a pivot table in Excel?';
-      const aiResponse = 'To create a pivot table in Excel, select your data range, go to Insert > PivotTable, choose your data source and location, then drag fields to the appropriate areas in the PivotTable Fields pane.';
+        // Mock specific response for this test
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'Creating Excel Pivot Tables',
+          usage: { input_tokens: 100, output_tokens: 5, total_tokens: 105 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
 
-      const title = await generateConversationTitle(userMessage, aiResponse);
+        const userMessage = 'How do I create a pivot table in Excel?';
+        const aiResponse = 'To create a pivot table in Excel, select your data range, go to Insert > PivotTable, choose your data source and location, then drag fields to the appropriate areas in the PivotTable Fields pane.';
 
-      expect(title).toBeDefined();
-      expect(typeof title).toBe('string');
-      expect(title.length).toBeGreaterThan(0);
-      expect(title.length).toBeLessThanOrEqual(50);
-      // Should be concise (3-6 words typically means 10-40 chars)
-      expect(title.length).toBeGreaterThan(5);
+        const title = await generateConversationTitle(userMessage, aiResponse);
+
+        expect(title).toBe('Creating Excel Pivot Tables');
+        expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+        expect(mockAskOpenAI).toHaveBeenCalledWith(
+          expect.objectContaining({
+            model: 'gpt-4o-mini',
+            maxOutputTokens: 20,
+            temperature: 0.3,
+          })
+        );
+      });
+
+      it('should generate a title for Sydney Opera House-related conversation', async () => {
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'Weekend Shows at Opera House',
+          usage: { input_tokens: 100, output_tokens: 6, total_tokens: 106 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
+
+        const userMessage = 'What shows are playing this weekend?';
+        const aiResponse = 'I can help you find current performances at the Sydney Opera House. This weekend features several shows including opera, ballet, and concerts. For specific showtimes and tickets, I recommend checking our official website or calling the box office.';
+
+        const title = await generateConversationTitle(userMessage, aiResponse);
+
+        expect(title).toBe('Weekend Shows at Opera House');
+        expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+      });
+
+      it('should return fallback title for empty messages', async () => {
+        // No API call should be made due to input validation
+        const title = await generateConversationTitle('', '');
+
+        expect(title).toBe('New Conversation');
+        expect(mockAskOpenAI).not.toHaveBeenCalled();
+      });
+
+      it('should handle long responses by truncating in prompt', async () => {
+        mockAskOpenAI.mockResolvedValueOnce({
+          text: 'Services Overview Discussion',
+          usage: { input_tokens: 120, output_tokens: 5, total_tokens: 125 },
+          model: 'gpt-4o-mini',
+          finishReason: 'stop',
+        });
+
+        const userMessage = 'Tell me about your services';
+        const longResponse = 'A'.repeat(500); // Very long response
+
+        const title = await generateConversationTitle(userMessage, longResponse);
+
+        expect(title).toBe('Services Overview Discussion');
+        expect(title.length).toBeLessThanOrEqual(50);
+        expect(mockAskOpenAI).toHaveBeenCalledTimes(1);
+      });
     });
-
-    it('should generate a title for Sydney Opera House-related conversation', async () => {
-      const userMessage = 'What shows are playing this weekend?';
-      const aiResponse = 'I can help you find current performances at the Sydney Opera House. This weekend features several shows including opera, ballet, and concerts. For specific showtimes and tickets, I recommend checking our official website or calling the box office.';
-
-      const title = await generateConversationTitle(userMessage, aiResponse);
-
-      expect(title).toBeDefined();
-      expect(typeof title).toBe('string');
-      expect(title.length).toBeGreaterThan(0);
-      expect(title.length).toBeLessThanOrEqual(50);
-      // Should be concise (3-6 words typically means 10-40 chars)
-      expect(title.length).toBeGreaterThan(5);
-    });
-
-    it('should return fallback title for empty messages', async () => {
-    const title = await generateConversationTitle('', '');
-
-    expect(title).toBe('New Conversation');
-  });
-
-  it('should handle long responses by truncating in prompt', async () => {
-    const userMessage = 'Tell me about your services';
-    const longResponse = 'A'.repeat(500); // Very long response
-
-    const title = await generateConversationTitle(userMessage, longResponse);
-
-    expect(title).toBeDefined();
-    expect(title.length).toBeLessThanOrEqual(50);
-  });
-  });
 });

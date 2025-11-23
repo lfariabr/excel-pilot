@@ -7,6 +7,11 @@ import { logOpenAI, logError } from '../utils/logger';
 export async function generateConversationSummary(
     messages: any,
 ): Promise<string> {
+    // Validate inputs before making API call
+    if (!messages || (typeof messages === 'string' && !messages.trim()) || (Array.isArray(messages) && messages.length === 0)) {
+        return "No summary available";
+    }
+
     try {
         // Combine messages into a single prompt for summary generation
         const summaryPrompt = `Summarize this conversation in 2-3 sentences focusing on:
