@@ -1,0 +1,455 @@
+{
+  "venue": {
+    "name": "Sydney Wharf Apartments",
+    "location": "56 Pirrama Road & 56A Pirrama Road, Pyrmont NSW 2009",
+    "website": "https://sydneywharfapartments.com",
+    "emergency": "000 (Ambulance / Fire / Police)"
+  },
+
+  "important_numbers": {
+    "emergency_services": {
+      "triple_zero": "000",
+      "city_central_police": "(02) 9265 6499",
+      "water_police_general": "(02) 9320 7499",
+      "water_police_noise": "(02) 9320 7421",
+      "council_rangers_24h": "(02) 9265 9333",
+      "boat_noise_shfa": "(02) 8267 0710"
+    },
+    "building_management": {
+      "main_line": "(02) 9660 8912",
+      "building_manager_name": "Michael Sgouros",
+      "building_manager_mobile_emergencies_only": "0458 888 681",
+      "email": "manager@sydneywharfapartments.com"
+    },
+    "concierge": {
+      "provider": "Excel Building Management",
+      "mobile": "0418 457 812",
+      "landline": "(02) 9960 8956",
+      "location": "Lobby D, southern end of Wharf 9",
+      "hours": "7:00am – 7:00pm, Monday to Sunday",
+      "email": "concierge@sydneywharfapartments.com"
+    },
+    "security": {
+      "provider": "Excel Building Management Security Patrols",
+      "chief_security_mobile": "0418 457 812",
+      "operations": "7:00pm – 7:00am, 7 days a week"
+    },
+    "strata_manager": {
+      "name": "Luke Derwent",
+      "company": "McCormacks Strata",
+      "phone": "(02) 9299 6722",
+      "email": "luke.derwent@mccormacks.com.au"
+    },
+    "strata_committee": {
+      "chair_email": "chairman@sydneywharfapartments.com",
+      "secretary_email": "secretary@sydneywharfapartments.com",
+      "treasurer_email": "treasurer@sydneywharfapartments.com"
+    },
+    "other_handy_numbers": {
+      "newspaper_orders_central_pyrmont_newsagency": "(02) 9552 4581",
+      "foxtel": "131 999",
+      "air_conditioning_tempest": "(02) 9838 9811",
+      "electrical_cts": "0418 407 352",
+      "plumbing_plumbers_direct": "1300 877 448",
+      "miele_appliances": "(02) 8977 4235",
+      "locksmith_gr8_key_services": "0478 539 247",
+      "sydney_wharf_marina": "0431 700 070",
+      "the_star_security": "9657 9780"
+    }
+  },
+
+  "overview": {
+    "welcome": "Sydney Wharf is a luxury waterfront residential development on Pyrmont’s finger wharves. The handbook exists to help residents and newcomers understand facilities, rules, and how to enjoy the building community responsibly.",
+    "purpose": "Provide practical guidance on day-to-day living at Sydney Wharf, including access, security, facilities, by-laws, safety, and how to contact building stakeholders. It is a general reference for residents, not a legal document.",
+    "disclaimer": "The Resident Guide is for general guidance only. It is not legally binding and does not constitute legal advice. For formal rights and obligations, residents must rely on the registered by-laws and seek independent legal advice where required."
+  },
+
+  "core_info": {
+    "address": {
+      "wharf_9": "Sydney Wharf 9, 56 Pirrama Road, Pyrmont NSW 2009",
+      "wharf_8": "Sydney Wharf 8, 56A Pirrama Road, Pyrmont NSW 2009",
+      "courier_parcels_note": "Courier parcels should be addressed to Concierge at Lobby D, Wharf 9."
+    },
+    "taxis_and_couriers": {
+      "description": "Sydney Wharf is at the end of the access road off the eastern end of Pirrama Road (near the Maritime Museum), between Wharf 7 and Wharf 10. The building is signposted on Pirrama Road and listed in major GPS systems including Google Maps."
+    },
+    "access_fobs_airkeys": {
+      "system": "A proximity key fob and Air key system secures the buildings and car park.",
+      "fob_usage": [
+        "Access to your entry lobby HOME STACK glass doors (front and back).",
+        "Lift access to your HOME STACK, HOME FLOOR, and basement.",
+        "Access to Concierge lobby glass entrance doors.",
+        "Access to gym/swimming pool via Concierge lobby.",
+        "Lift access from Concierge lobby to basement car park."
+      ],
+      "airkey_usage": [
+        "Vehicle access to the residents’ underground car park (button 1 for entry, button 2 for exit).",
+        "May also provide lobby and lift access from Concierge lobby to basement for safety reasons."
+      ],
+      "entitlements": {
+        "key_fobs_per_apartment_lot": 6,
+        "airkeys_single_car_space": 2,
+        "airkeys_multiple_car_spaces": "1 Air key per car space included in the lot.",
+        "marina_owners": "Car space lot owners who are not apartment owners are entitled to 1 Air key per car space, programmed for car park and Concierge lobby access only."
+      },
+      "ownership_and_transfer": "Physical key fobs and Air keys are the property of individual lot owners and must be passed to new owners when a lot is sold. Fobs/Air keys are deactivated on property sale or tenant vacating and reactivated for new residents upon presentation and landlord approval at the start of each tenancy.",
+      "replacements": {
+        "purchase": "Replacement or additional fobs/Air keys (within allowed maximums) may be purchased by lot owners via Concierge.",
+        "prices": {
+          "key_fob_aud": 55,
+          "airkey_aud": 110
+        },
+        "loss": "Lost Air keys or key fobs require a signed declaration and the lost device will be deactivated.",
+        "audits": "Annual audits of access devices are conducted; unaccounted devices may be deactivated."
+      },
+      "safety": {
+        "unrestricted_basement_to_ground_lift_access": "Lifts allow unrestricted ascending travel from basement to ground floor for safety.",
+        "responsibility": "Lot owners remain responsible for devices issued to tenants or guests; misuse can result in access being revoked."
+      }
+    },
+    "after_hours_access_for_visitors": {
+      "spare_keys_with_concierge": "Owners/residents may leave a spare key with Building Manager/Concierge for lockouts, deliveries or trades when they are not present, during business hours only.",
+      "authorisation_required": "A signed temporary access form is required, explicitly authorising entry or key handover to named persons. Visitors or trades must show identification.",
+      "scanned_authorisations": "Scanned and signed authorisations are acceptable if arranged in advance with Building Manager/Concierge."
+    },
+    "visitor_access": {
+      "lobby_access": "Pedestrian visitors can only access lobbies by calling a resident from the intercom outside the lobby or boom gate.",
+      "intercom_usage": "Visitors enter the apartment number on the intercom at the boom gate or lobby to call the resident. The intercom system was upgraded in 2021; detailed operating instructions are available from Concierge by email.",
+      "responsibility": "Residents are responsible for who they allow into the building."
+    },
+    "moving": {
+      "notice_required": "Moves must be approved by the Building Manager/Concierge with at least 48 hours’ notice.",
+      "allowed_times": "Weekdays only, between 9:00am and 4:00pm, excluding public holidays.",
+      "lift_usage": "Lifts will generally not be locked off unless specifically authorised by Concierge or Building Manager, as locked lifts prevent residents accessing the basement car park.",
+      "common_area_inspection": "Before a move, a Common Area Inspection Sheet is completed with Building Manager/Concierge, documenting existing damage between the building entry and the apartment door. After the move, the sheet is reviewed again to record any new damage. Residents are liable for damage caused."
+    },
+    "deliveries": {
+      "service_vehicle_spaces": "Delivery drivers are to use one of the six service vehicle spaces in the visitors’ car park unless an exception (e.g. removalists/builders) is approved by Concierge.",
+      "takeaway_food": "Food delivery riders/drivers must park in a service bay and hand-carry deliveries to lobbies. Riding scooters along the footpath is not permitted due to disturbance and safety risks.",
+      "concierge_parcel_handling": "Concierge can accept mail, dry cleaning, parcels, courier and general deliveries on behalf of residents during concierge hours."
+    }
+  },
+
+  "rules_and_policies": {
+    "balconies_smoking": {
+      "falling_objects": "No objects are to be thrown, dislodged or allowed to fall from balconies, including cigarette butts and ash. Falling items can be extremely dangerous and may cause damage or fire.",
+      "washing_and_cleaning": "Do not use hoses to wash shutters or decks in a way that causes water or debris to fall onto apartments below. Be considerate of neighbours when cleaning.",
+      "clothes_and_drying": "By-laws do not permit hanging washing, clothing, towels or bedding on balconies. Clothes airers must not be visible from the boardwalks. Dryers are provided in apartment laundries.",
+      "satellite_dishes_and_aerials": "Satellite dishes or television aerials must not be affixed to balconies.",
+      "bicycles_storage": "Bicycles should not be stored on balconies; they should be stored in the car park within your storeroom or allocated parking space.",
+      "appearance": "Balconies are visible from outside areas and should be kept in a condition consistent with Sydney Wharf standards.",
+      "smoking": "Do not flick ash or butts over balcony edges. Residents may be liable for damage or fire caused by careless disposal of cigarette waste.",
+      "drain_maintenance": "Residents should ensure the drain under timber balcony boards (accessible via the small removable hatch) is kept clear to prevent standing water and mosquito breeding."
+    },
+    "barbeques": {
+      "summary": "Residents must comply with by-laws and any specific building policies regarding barbeques. Barbeques must never be used in common areas or on the boardwalk, and residents should confirm current rules with the Building Manager before installing or using a barbeque on a balcony."
+    },
+    "bicycles": {
+      "storage": "Bicycles are to be stored in residents’ car spaces or storerooms, not on balconies and not left in common areas unless otherwise authorised.",
+      "boardwalk": "Riding bicycles is not permitted on the boardwalk, which is a pedestrian-only area."
+    },
+    "boardwalk": {
+      "description": "The boardwalk surrounds Sydney Wharf and is adjacent to deep water without safety barriers or handrails. It is under constant video surveillance and regular security patrols.",
+      "rules": [
+        "No vehicles, cycling, skateboarding, scooters or rollerblading.",
+        "No consumption of alcohol.",
+        "No intoxicated, unruly or indecent behaviour.",
+        "No dogs unless on a leash; any waste must be removed by the handler.",
+        "No diving or swimming.",
+        "No fishing.",
+        "No mooring of vessels.",
+        "No lighting of fires or barbeques.",
+        "Life buoys are for emergency use only.",
+        "Persons caught damaging equipment or property will be prosecuted."
+      ]
+    },
+    "bylaws": {
+      "obligation": "Owners and occupiers must read, understand and comply with the registered by-laws of Sydney Wharf (Strata Plan 80052). Copies are available from Concierge.",
+      "key_sections": {
+        "section_3": "Behaviour of owners, occupiers and others; responsibility for guests and contractors.",
+        "section_4": "Permitted uses of common areas and what cosmetic works may be undertaken without approval.",
+        "section_8": "Use of car park areas and storage cages.",
+        "section_10": "Moving goods or furniture in or out of the property.",
+        "section_11": "Garbage disposal rules.",
+        "section_12": "Pets policies.",
+        "section_17": "Balcony wall works."
+      },
+      "policies": "The Strata Committee has also issued several policy documents which supplement by-laws and govern practical day-to-day procedures. Approved policies are available from Concierge."
+    },
+    "noise": {
+      "within_sydney_wharf": "Residents are expected to be considerate with noise inside apartments and common areas, particularly late at night. Persistent noise issues should be reported to Security, Concierge or Building Management.",
+      "neighbourhood_noise": "External noise issues (e.g. boats, nearby venues) may be reported to relevant authorities such as Water Police, Council Rangers or SHFA using the important numbers listed in the guide."
+    },
+    "airbnb_holiday_letting": {
+      "short_term_letting": "Short-term or holiday letting, including Airbnb-type arrangements, is not permitted at Sydney Wharf.",
+      "zoning_basis": "The development is designated for residential development and permanent accommodation, not for hotels, serviced apartments, tourist accommodation or similar.",
+      "minimum_lease_term": "Any apartment leasing must be for a minimum of 6 calendar months.",
+      "signage": "No signs of any kind are to be displayed in relation to leasing.",
+      "enforcement_note": "Owners and residents must ensure their leasing arrangements comply; breaches may lead to enforcement action under the by-laws."
+    },
+    "pets": {
+      "summary": "Pets are governed by Section 12 of the by-laws. Owners and residents should consult the by-laws and contact the Strata Manager before bringing a pet into the building to confirm current requirements and approval processes."
+    }
+  },
+
+  "facilities": {
+    "carpark_resident": {
+      "access": "Residents access the underground car park using programmed Air keys and, where applicable, key fobs.",
+      "bylaws_reference": "Usage of car spaces and storage cages is defined in Section 8 of the by-laws.",
+      "safety": "Garage entry/exit doors must not be jammed open or obstructed. Security checks doors regularly.",
+      "storage_and_waste": "Building waste must not be stored long-term in car spaces or storerooms; no building waste is allowed in visitor car park or storerooms."
+    },
+    "carpark_visitor": {
+      "spaces": "Visitor parking is provided in designated visitor car park spaces. Service vehicle spaces are provided for deliveries and trades.",
+      "trades_access": "Tradespeople must use service vehicle spaces and arrange access via Building Manager/Concierge. They are not permitted to park in resident car spaces unless specifically authorised."
+    },
+    "car_washing": {
+      "summary": "Residents must follow building rules regarding car washing facilities and drainage. Any dedicated car wash areas and their conditions of use are defined in building policies and by-laws; residents should confirm details with Building Management."
+    },
+    "garbage": {
+      "domestic_waste": [
+        "All small domestic garbage items must be bagged and tied before being placed in the garbage chutes.",
+        "Do not place paper, glass objects, coat hangers, bulky packages or oversized items in chutes.",
+        "Double-bag strong-smelling or messy items (e.g. oils) to prevent drips that may damage corridor carpet."
+      ],
+      "recycling": [
+        "Use the separate recycling bins in garbage rooms: PAPER and GLASS/PLASTIC/PET/CANS.",
+        "Wash smelly recyclable items before placing them in the appropriate bin."
+      ],
+      "large_items": [
+        "Large boxes or significant volumes of rubbish/recycling should be taken to garbage rooms next to the lift wells in the basement resident car park.",
+        "Do not attempt to force large items down chutes."
+      ]
+    },
+    "storage": {
+      "storage_areas": "Storage cages and rooms in the basement are for approved resident storage only and must comply with by-laws, including fire safety requirements and restrictions on flammable items.",
+      "lighting": "Storage areas and garbage rooms have manual light switches. Residents must switch lights off after use."
+    },
+    "gym_pool": {
+      "location": "Gym and swimming pool are located in the Concierge Lobby area.",
+      "access": "Access is via resident key fob, subject to by-laws and building rules.",
+      "monitoring": "Concierge monitors pool and gym usage and may advise or report misuse.",
+      "maintenance": "The Building Manager takes daily pool readings and adjusts water chemistry as necessary.",
+      "rules": "Residents must follow posted pool and gym rules, including supervision of children, hygiene, and hours of operation."
+    },
+    "internet": {
+      "services": [
+        "Sydney Wharf is served by ultra high-speed fibre-optic internet via the NBN.",
+        "Residents may subscribe to NBN services through providers such as Optus, Telstra, TPG and others.",
+        "Additional high-speed service is available through GIGACOMM."
+      ],
+      "responsibility": "Service choice, subscription and installation costs are the responsibility of each apartment resident."
+    },
+    "lighting": {
+      "lobbies": "Lobby lights are CBUS-based and centrally programmed based on time of day. Motion sensors may switch additional lights on briefly when residents move through areas to save energy.",
+      "manual_areas": "Storage areas and garbage rooms use manual switches; residents must switch lights off after use."
+    },
+    "newspapers": {
+      "orders": "Newspaper orders can be arranged through Central Pyrmont Newsagency on (02) 9552 4581."
+    }
+  },
+
+  "operations": {
+    "concierge": {
+      "location": "Lobby D, southern-most end of Wharf 9.",
+      "hours": "7:00am – 7:00pm daily.",
+      "services": [
+        "Meet and greet residents and guests.",
+        "Accept mail, dry cleaning, parcels, courier and general deliveries.",
+        "Administer spare keys for cleaners and tradespeople under resident authorisation.",
+        "Coordinate weekday security and trades access.",
+        "Monitor cleaning activities and cleanliness of common areas.",
+        "Monitor and report on common area, pool and gym use.",
+        "Monitor visitors car park usage.",
+        "Monitor and coordinate moves in and out.",
+        "Check reports of damage or malfunctioning equipment and either address directly or escalate to Building Management.",
+        "Provide local information on Sydney Wharf, nearby restaurants, entertainment and services.",
+        "Maintain an up-to-date list of local service providers."
+      ]
+    },
+    "building_manager": {
+      "location": "Office in basement resident car park near the security gate entrance on Wharf 9.",
+      "hours": "On-site 7:00am – 3:00pm, Monday to Friday.",
+      "responsibilities": [
+        "Single point of contact for building issues.",
+        "Manage cleaning contract and oversee performance of Concierge and cleaners.",
+        "Supervise security personnel.",
+        "Prepare a monthly building report.",
+        "Regularly inspect floors and investigate matters raised by Concierge.",
+        "Ensure plant and equipment are regularly inspected, maintained and serviced.",
+        "Seek cost-effective tenders, monitor and manage contractors.",
+        "Develop and maintain a Structural Maintenance Register.",
+        "Maintain a list of preferred tradespeople.",
+        "Attend to compliance certificates and defect rectification.",
+        "Take daily pool readings and maintain water quality.",
+        "Report breaches of by-laws to the Strata Committee."
+      ]
+    },
+    "security": {
+      "patrol_hours": "7:00pm – 7:00am, Monday to Sunday.",
+      "duties": [
+        "Perform regular walk-around patrols covering both wharf buildings, garage and marina (approximately hourly at night, at least twice per day in daylight).",
+        "Check foyer entrance doors and emergency exits are properly locked.",
+        "Check garage entry door is not jammed or obstructed.",
+        "Provide a visible deterrent to unauthorised activity at night.",
+        "Respond to incidents according to standard security protocols and contact police where appropriate.",
+        "Monitor security cameras from Concierge desk when not on patrol.",
+        "Respond promptly to fire alarm panel alerts following established procedures."
+      ],
+      "resident_security_tips": [
+        "Keep balcony doors locked when you are out or asleep.",
+        "Only let people you know or are expecting into the building.",
+        "Be wary of individuals claiming to be delivery, trades, friends of other residents or service personnel without verification.",
+        "Report suspicious or unusual activity to Security, Concierge, Building Manager or Police."
+      ]
+    },
+    "cleaning_advice": {
+      "summary": "The Resident Guide includes best-practice cleaning advice for bathroom tiles, stonework, shower screens, hardware and joinery. Residents should follow manufacturer and building guidelines to avoid damage and maintain warranties."
+    },
+    "tradespeople": {
+      "parking": "Trades must use service vehicle spaces in the visitors’ car park unless otherwise authorised.",
+      "lifts": "Tradespeople are not permitted to lock lifts off unless granted specific permission by Concierge or Building Manager.",
+      "common_area_inspection": "For renovation or building works, a Common Area Inspection Sheet is completed before and after works to record any damage. Owners are liable for damage caused.",
+      "waste": "Building waste must not be stored for more than 24 hours in apartment car spaces and is not permitted in storerooms/cages or the visitors’ car park."
+    }
+  },
+
+  "maintenance": {
+    "renovations": {
+      "approval": "Owners must follow by-laws (including By-law 19 and Special By-law 12) and obtain Strata Committee/Owners Corporation approval before starting renovations or additions affecting apartments, car spaces or storerooms.",
+      "procedure": [
+        "Consult Building Manager for the correct renovation application process.",
+        "Submit written application in the approved form to the Strata Committee or Strata Manager.",
+        "Agree to conditions on working hours, noise, waste storage and common area protection.",
+        "Complete a Common Area Inspection Sheet with Building Manager/Concierge before and after works.",
+        "Pay for any damage to common property caused by works."
+      ],
+      "council_requirements": "Some works may require a Sydney City Council Development Application; owners should confirm with Building Management and Strata Manager."
+    },
+    "water_leaks": {
+      "risk": "Timber floors are particularly vulnerable to water damage. Water leaks can cause costly repairs and increased insurance premiums.",
+      "high_risk_appliances": [
+        "Instant under-sink water heaters/chillers (e.g. ZIP units).",
+        "Refrigerators plumbed into water supply for ice-making or water dispensing."
+      ],
+      "bylaw_reference": "Special By-law 4 – Connection of appliances to water supply – defines mandatory technical standards, certification requirements, annual inspection and penalties for non-compliance causing leaks.",
+      "resident_guidelines": [
+        "Ensure plumbed appliances meet Special By-law 4 and the technical specification document. Seek Building Manager advice if unsure.",
+        "Be vigilant for any signs of leaks, no matter how small, around plumbed appliances and report them immediately.",
+        "Arrange prompt inspection and repair by qualified trades if a leak is detected.",
+        "Know the location of your main water isolation valve (in the Fire Hose Reel cupboard outside your front door) and how to turn it off.",
+        "Turn water off immediately in the event of a significant leak and notify Building Management."
+      ]
+    },
+    "warranties": {
+      "appliances_and_finishes": "Various appliances and finishes in apartments are covered by manufacturer warranties.",
+      "guidance": "Follow maintenance guidelines in the Owner’s Manuals provided at completion. A soft copy is available from Building Manager on request.",
+      "note": "Failure to follow prescribed maintenance guidance may affect warranty coverage."
+    },
+    "fresh_air_vents": {
+      "purpose": "Each apartment has a fresh air vent near the front door to balance air pressure, drawing air from intake at roof level.",
+      "odours": "Occasional outside smells may be noticeable through the vent. If smells are persistent, residents should report this to Building Manager or Concierge."
+    }
+  },
+
+  "safety_and_emergencies": {
+    "fire_alarms": {
+      "apartment_detectors": "Each apartment has battery-powered smoke detectors. Everyday cooking (e.g. burnt toast) may trigger them.",
+      "silencing": "Apartment alarms may be turned off at the detector fitting. Do not open the apartment front door while smoke is present, as it may trigger the building-wide alarm.",
+      "battery_replacement": "A short intermittent beep indicates low battery. Detectors can be twisted anti-clockwise to remove, battery replaced, then twisted clockwise to re-fit."
+    },
+    "fire_doors": {
+      "usage": "Fire doors must remain accessible from inside the building and are intended for FIRE ESCAPE only, not for general entry/exit."
+    },
+    "fire_hoses": {
+      "location": "Fire hose reels and extinguishers are located in the fire hose reel cupboards on each lobby level."
+    },
+    "evacuation": {
+      "pa_system": "Lobby PA speakers announce fire drills and emergencies. Residents must follow given instructions.",
+      "stairs": "Internal exit stairs to ground level are accessed via foyers (for non-ground apartments). Basement fire stairs are also available.",
+      "no_lifts": "Lifts must not be used during building evacuation.",
+      "assembly_point": "Emergency Assembly Point is Pirrama Bay Park."
+    }
+  },
+
+  "faqs": [
+    {
+      "id": 1,
+      "question": "What are the Concierge hours and where are they located?",
+      "answer": "Concierge is located in Lobby D at the southern end of Wharf 9 and operates daily from 7:00am to 7:00pm. They handle deliveries, keys, visitor coordination and general building assistance."
+    },
+    {
+      "id": 2,
+      "question": "Who do I contact in an emergency?",
+      "answer": "For life-threatening emergencies, call 000 (Ambulance/Fire/Police). For building-related urgent issues, contact the Building Manager (emergencies only mobile) or Security/Concierge using the important numbers provided in the guide."
+    },
+    {
+      "id": 3,
+      "question": "How do I get or replace access fobs and Air keys?",
+      "answer": "Access devices are owned by lot owners and programmed under a building policy. Replacements or additional devices (within maximum limits) can be purchased only by lot owners via Concierge. Lost devices require a signed loss declaration and will be deactivated."
+    },
+    {
+      "id": 4,
+      "question": "How do visitors access the building and my lobby?",
+      "answer": "Visitors must use the intercom at the boom gate or lobby, enter your apartment number, and wait for you to answer and grant access. Visitors cannot freely enter lobbies without resident authorisation."
+    },
+    {
+      "id": 5,
+      "question": "Where can delivery drivers and trades park?",
+      "answer": "Delivery drivers and trades should use the service vehicle spaces in the visitors’ car park. Exceptions (e.g. large moves, builders) must be approved by Concierge. Food delivery scooters must park in a service bay and hand-carry deliveries to lobbies."
+    },
+    {
+      "id": 6,
+      "question": "What are the rules for balconies and smoking?",
+      "answer": "Nothing may be thrown or allowed to fall from balconies, including cigarette butts and ash. Washing cannot be hung on balconies and hoses should not be used in ways that disturb apartments below. Bicycles, satellite dishes or TV aerials are not permitted on balconies. Balcony appearance must meet building standards."
+    },
+    {
+      "id": 7,
+      "question": "Is Airbnb or short-term holiday letting allowed?",
+      "answer": "No. Sydney Wharf is strictly for permanent residential accommodation. Short-term or holiday letting, including Airbnb-type stays, is not permitted. Leases must be at least 6 calendar months and no advertising signs may be displayed."
+    },
+    {
+      "id": 8,
+      "question": "How should I dispose of rubbish and recycling?",
+      "answer": "Bag and tie domestic rubbish before placing it in the chute. Do not put glass, paper, large or bulky items in the chutes. Use basement garbage rooms for large boxes and use the separate recycling bins for paper and for glass/plastic/PET/cans."
+    },
+    {
+      "id": 9,
+      "question": "What are the rules for moving in or out?",
+      "answer": "Moves must be booked with Building Manager/Concierge at least 48 hours in advance. Moves are allowed only on weekdays, 9:00am–4:00pm (no public holidays). A Common Area Inspection Sheet is completed before and after, and residents are responsible for any damage."
+    },
+    {
+      "id": 10,
+      "question": "How do I arrange renovations to my apartment?",
+      "answer": "You must read relevant by-laws (including By-law 19 and Special By-law 12) and submit a written application in the approved form to the Strata Committee/Strata Manager. Consult the Building Manager for the process. Works may also require a Council Development Application. Common areas must be protected and any damage repaired at the owner’s expense."
+    },
+    {
+      "id": 11,
+      "question": "What should I do if I notice a water leak?",
+      "answer": "Treat any leak as urgent. Turn off your apartment’s main water isolation valve in the Fire Hose Reel cupboard outside your front door, report it to Building Management immediately, and arrange a qualified tradesperson. Ensure any plumbed appliances comply with Special By-law 4."
+    },
+    {
+      "id": 12,
+      "question": "How do I access and use the gym and pool?",
+      "answer": "Access is via your key fob through the Concierge Lobby. Residents must follow posted pool and gym rules. Concierge and Building Manager monitor usage and water quality. Children must be supervised at all times."
+    },
+    {
+      "id": 13,
+      "question": "Who do I contact about noise or suspicious behaviour?",
+      "answer": "For internal noise or disturbances, contact Security, Concierge or Building Management. For external noise (e.g. boats), use Council Rangers, Water Police or SHFA contacts in the important numbers list. Suspicious activity should be reported promptly to Security and, if necessary, Police."
+    }
+  ],
+
+  "quick_facts": {
+    "building_type": "Luxury waterfront finger wharf residential development.",
+    "wharves": "Two main residential wharves: Sydney Wharf 8 and Sydney Wharf 9.",
+    "concierge_hours": "7:00am – 7:00pm daily (Lobby D, Wharf 9).",
+    "building_manager_hours": "7:00am – 3:00pm, Monday to Friday.",
+    "security_patrol_hours": "7:00pm – 7:00am, 7 days a week.",
+    "emergency_assembly_point": "Pirrama Bay Park.",
+    "internet": "High-speed NBN fibre plus GIGACOMM services available; residents choose providers.",
+    "short_term_letting": "Short-term holiday letting (e.g. Airbnb) is not permitted.",
+    "airkeys_fobs": "Access controlled by programmed key fobs and Air keys; devices owned by lot owners and managed under building policy.",
+    "boardwalk_rules_highlights": "No vehicles, bikes, scooters, alcohol, fishing, diving, swimming or mooring; deep water with no railings; under CCTV and security patrols."
+  }
+}

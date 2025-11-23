@@ -23,7 +23,7 @@ export const messagesQuery = {
 
         try {
             logGraphQL('GraphQL messages query called', {
-                userId: ctx.user.sub,
+                userId: ctx.user?.sub,
                 conversationId,
                 first,
                 after,
@@ -33,9 +33,9 @@ export const messagesQuery = {
 
             // Verify user owns the conversation
             const conversation = await Conversation.findById(conversationId);
-            if (!conversation || String(conversation.userId) !== ctx.user.sub) {
+            if (!conversation || String(conversation.userId) !== ctx.user?.sub) {
                 logError('Forbidden messages access attempt', new Error('User does not own conversation'), {
-                    userId: ctx.user.sub,
+                    userId: ctx.user?.sub,
                     conversationId,
                     conversationOwner: conversation?.userId
                 });
@@ -81,7 +81,7 @@ export const messagesQuery = {
             const connection = createConnection(messages_result, { first, after, before, last }, messages.length, hasNextPage, hasPreviousPage);
             
             logGraphQL('GraphQL messages query completed', {
-                userId: ctx.user.sub,
+                userId: ctx.user?.sub,
                 conversationId,
                 messagesReturned: messages_result.length,
                 hasNextPage,
@@ -94,7 +94,7 @@ export const messagesQuery = {
                 throw error; // Re-throw GraphQL errors (already logged)
             }
             logError('Error fetching messages', error as Error, {
-                userId: ctx.user.sub,
+                userId: ctx.user?.sub,
                 conversationId,
                 first,
                 after

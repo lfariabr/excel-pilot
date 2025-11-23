@@ -15,10 +15,10 @@ export const conversationsQuery = {
 
         try {
             logGraphQL('GraphQL conversations query called', {
-                userId: ctx.user.sub
+                userId: ctx.user?.sub
             });
 
-            const conversations = await Conversation.find({ userId: ctx.user.sub }).sort({ updatedAt: -1 , _id: -1 });
+            const conversations = await Conversation.find({ userId: ctx.user?.sub }).sort({ updatedAt: -1 , _id: -1 });
             
             // Format timestamps in the query result
             const conversations_result = conversations.map(conversation => {
@@ -35,14 +35,14 @@ export const conversationsQuery = {
             });
 
             logGraphQL('GraphQL conversations query completed', {
-                userId: ctx.user.sub,
+                userId: ctx.user?.sub,
                 count: conversations_result.length
             });
 
             return conversations_result;
         } catch (error) {
             logError('Error fetching conversations', error as Error, {
-                userId: ctx.user.sub
+                userId: ctx.user?.sub
             });
             throw error;
         }

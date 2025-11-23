@@ -166,10 +166,36 @@ export const messagesMutation = {
                     actual: actualTokens
                 });
                 
-                await userRateLimiter.checkUserTokenBudget(
+                // Check if adjustment would exceed budget
+                const adjustmentResult = await userRateLimiter.checkUserTokenBudget(
                     ctx.user.sub, 
                     tokenDifference
                 );
+                
+                if (!adjustmentResult.allowed) {
+                    // Log budget breach (response already generated, can't undo)
+                    logRateLimit('Token budget exceeded during post-call adjustment', {
+                        userId: ctx.user.sub,
+                        conversationId,
+                        tokenDifference,
+                        estimated: estimatedTokens,
+                        actual: actualTokens,
+                        remaining: adjustmentResult.remaining,
+                        wouldNeedTotal: estimatedTokens + tokenDifference
+                    });
+                    // Note: We don't throw here because the AI response was already generated
+                    // and the user received value. Budget is debited regardless.
+                }
+            } else if (tokenDifference < 0) {
+                // Overestimated - user was conservatively charged, which is acceptable
+                logRateLimit('Token budget overestimation (user conservatively charged)', {
+                    userId: ctx.user.sub,
+                    conversationId,
+                    tokenDifference: Math.abs(tokenDifference),
+                    estimated: estimatedTokens,
+                    actual: actualTokens
+                });
+                // Note: We don't refund overestimations as it provides a safety buffer
             }
 
             // persist assistant message

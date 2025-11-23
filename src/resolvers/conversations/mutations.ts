@@ -123,6 +123,51 @@ export const conversationsMutation = {
             model: talkToOpenAI.model
         });
 
+        // Adjust token budget based on actual usage
+        const actualTokens = TokenEstimator.getActualTokens(talkToOpenAI);
+        const tokenDifference = actualTokens - estimatedTokens;
+
+        if (tokenDifference > 0) {
+            logRateLimit('Adjusting token budget for underestimation', {
+                userId: ctx.user.sub,
+                conversationId: (conversation._id as any).toString(),
+                tokenDifference,
+                estimated: estimatedTokens,
+                actual: actualTokens
+            });
+            
+            // Check if adjustment would exceed budget
+            const adjustmentResult = await userRateLimiter.checkUserTokenBudget(
+                ctx.user.sub, 
+                tokenDifference
+            );
+            
+            if (!adjustmentResult.allowed) {
+                // Log budget breach (response already generated, can't undo)
+                logRateLimit('Token budget exceeded during post-call adjustment', {
+                    userId: ctx.user.sub,
+                    conversationId: (conversation._id as any).toString(),
+                    tokenDifference,
+                    estimated: estimatedTokens,
+                    actual: actualTokens,
+                    remaining: adjustmentResult.remaining,
+                    wouldNeedTotal: estimatedTokens + tokenDifference
+                });
+                // Note: We don't throw here because the AI response was already generated
+                // and the user received value. Budget is debited regardless.
+            }
+        } else if (tokenDifference < 0) {
+            // Overestimated - user was conservatively charged, which is acceptable
+            logRateLimit('Token budget overestimation (user conservatively charged)', {
+                userId: ctx.user.sub,
+                conversationId: (conversation._id as any).toString(),
+                tokenDifference: Math.abs(tokenDifference),
+                estimated: estimatedTokens,
+                actual: actualTokens
+            });
+            // Note: We don't refund overestimations as it provides a safety buffer
+        }
+
         // Persist assistant message
         const AIassistantMessage = await Message.create({
             conversationId: conversation._id,
@@ -141,11 +186,7 @@ export const conversationsMutation = {
 
         // Generate title
         generateConversationTitle(content, talkToOpenAI.text)
-            .then(title => updateConversationTitle((conversation._id as any).toString(), title))
-            .catch(error => logError('Error generating conversation title', error as Error, {
-                conversationId: (conversation._id as any).toString(),
-                userId: ctx.user.sub
-            }));
+            .then(title => updateConversationTitle((conversation._id as any).toString(), title))            
 
         // Bump conversation timestamps
         await Conversation.updateOne({ _id: conversation._id }, { lastMessageAt: new Date() });
@@ -153,7 +194,8 @@ export const conversationsMutation = {
         logGraphQL('Conversation started successfully', {
             userId: ctx.user.sub,
             conversationId: (conversation._id as any).toString(),
-            tokensUsed: talkToOpenAI.usage?.total_tokens
+            tokensUsed: actualTokens,
+            tokenDifference
         });
 
         const messageObj = AIassistantMessage.toObject() as any;

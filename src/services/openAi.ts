@@ -1,6 +1,7 @@
 // src/services/openai.ts
 import OpenAI from "openai";
 import briefing from "../data/briefing.json";
+import swharf from "../data/swharf.json";
 import { GraphQLError } from "graphql";
 import { logOpenAI, logError } from "../utils/logger";
 
@@ -10,7 +11,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 let cachedSystemPrompt: string | null = null;
 export function getSystemPrompt(): string {
   if(!cachedSystemPrompt){
-    const briefingText = JSON.stringify(briefing, null, 2);
+    const briefingText = JSON.stringify(swharf, null, 2);
     cachedSystemPrompt = `You are Excel's BM Concierge Personal Assistant.
 Follow these rules and only answer using this knowledge base (respond in Markdown, concise sections/bullets):
 
