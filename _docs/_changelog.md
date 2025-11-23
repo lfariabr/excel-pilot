@@ -1,5 +1,24 @@
 # ExcelPilot Changelog
 
+## Features Status Control:
+> *Note: ✅ = done, 🔥 = in progress, ⏳ = not started*
+
+| Feature | Status | Version | Details |
+| --- | --- | --- | --- |
+| Node.js + TypeScript | ✅ | _v0.0.1_ | Starting TypeScript Node.js project |
+| MongoDB | ✅ | _v0.0.2_ | Layer #1 (Database + Models): Added MongoDB connection and User model |
+| Express.js | ✅ | _v0.0.3_ | Layer #2 (Express API): Set up Express Server with basic User routes (CRUD) + error handler |
+| Apollo Server | ✅ | _v0.0.4_ | Layer #3 (GraphQL API): Set up Apollo Server with basic User queries and mutations |
+| Index.ts Refactoring | ✅ | _v0.0.5_ | Breaks `index.ts` into `server.ts` + `app.ts` + `graphql.ts` |
+| JWT + Auth | ✅ | _v0.0.6_ | Login, Register + Authentication (JWT, password hashing, requireAuth, requireRole) |
+| OpenAI | ✅ | _v0.0.7_ | OpenAI client (Agent, ChatMessage) |
+| Redis | ✅ | _v0.0.8_ | Redis (Rate Limiting, Token Budget - daily and monthly per user) |
+| OpenAI Core | ✅ | _v0.0.9_ | OpenAI Core (Responses API, Cursor Pagination, Auto Title and Summary) |
+| Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ | Rate Limit (Circuit Breaker, Analytics, Tiered Limits) |
+| Jest + Testing | ✅ | _v0.0.11_ | Jest + Testing: Unit tests, Integration tests, E2E tests |
+| Docker | ✅ | _v0.0.12_ | Docker: Containerized with multi-stage build, Docker Compose |
+| Winston | ✅ | _v0.0.13_ | Winston: Production-grade logging system |
+
 ---
 **v0.0.2** - Layer 1 (Database + Models): MongoDB
 > Goal: Set up MongoDB adding connection and User model
