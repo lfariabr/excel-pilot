@@ -23,7 +23,7 @@ It uses *Node.js*, *Express.js*, *Apollo Server*, *MongoDB*, *Redis*, *Jest*, *D
 | Rate Limit, Circuit Breaker, Analytics | ✅ | _v0.0.10_ |
 | Jest + Testing | ✅ | _v0.0.11_ |
 | Docker | ✅ | _v0.0.12_ |
-| Winston | 🔥 | _v0.0.13_ |
+| Winston | ✅ | _v0.0.13_ |
 
 ## **Detailed Changelog** 
 
@@ -40,10 +40,9 @@ It uses *Node.js*, *Express.js*, *Apollo Server*, *MongoDB*, *Redis*, *Jest*, *D
 - **v0.0.10** - Rate Limit (Circuit Breaker, Analytics, Tiered Limits)
 - **v0.0.11** - Jest + Testing: Unit tests, Integration tests, E2E tests
 - **v0.0.12** - Docker: Containerized with multi-stage build, Docker Compose
+- **v0.0.13** - Winston: Production-grade logging system
 
 ### **WORK IN PROGRESS**:
-
-- **v0.0.13** - Winston: Production-grade logging system
 
 ### **BACKLOG**:
 
