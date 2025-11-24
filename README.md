@@ -22,7 +22,6 @@
 - [Testing](#-testing)
 - [Roadmap](#️-roadmap)
 - [Contributing](#-contributing)
-- [License](#-license)
 
 ---
 
@@ -94,19 +93,19 @@
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                      Business Logic                         │
-│  ┌──────────┐  ┌──────────┐  ┌────────────┐  ┌─────────┐  │
-│  │   Auth   │  │  Users   │  │Conversations│  │Messages │  │
-│  │ Resolvers│  │Resolvers │  │ Resolvers  │  │Resolvers│  │
-│  └──────────┘  └──────────┘  └────────────┘  └─────────┘  │
+│  ┌──────────┐  ┌──────────┐  ┌─────────────┐  ┌─────────┐   │
+│  │   Auth   │  │  Users   │  │Conversations│  │Messages │   │
+│  │ Resolvers│  │Resolvers │  │ Resolvers   │  │Resolvers│   │
+│  └──────────┘  └──────────┘  └─────────────┘  └─────────┘   │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                       Data Layer                            │
-│  ┌──────────────┐   ┌──────────────┐   ┌────────────────┐  │
-│  │   MongoDB    │   │    Redis     │   │  OpenAI API    │  │
-│  │  (Primary)   │   │(Rate Limit)  │   │  (AI Agent)    │  │
-│  └──────────────┘   └──────────────┘   └────────────────┘  │
+│  ┌──────────────┐   ┌──────────────┐   ┌────────────────┐   │
+│  │   MongoDB    │   │    Redis     │   │  OpenAI API    │   │
+│  │  (Primary)   │   │(Rate Limit)  │   │  (AI Agent)    │   │
+│  └──────────────┘   └──────────────┘   └────────────────┘   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -598,28 +597,6 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore:` - Maintenance tasks
 - `ci:` - CI/CD changes
 
-### Code Style
-
-- Use TypeScript strict mode
-- Follow ESLint configuration
-- Write meaningful variable and function names
-- Add JSDoc comments for public APIs
-- Keep functions small and focused
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👤 Author
-
-**Luis Faria**
-- GitHub: [@lfariabr](https://github.com/lfariabr)
-- Project: [excel-pilot](https://github.com/lfariabr/excel-pilot)
-
 ---
 
 ## 🙏 Acknowledgments
@@ -627,12 +604,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [OpenAI](https://openai.com/) for the powerful GPT API
 - [Apollo GraphQL](https://www.apollographql.com/) for the excellent GraphQL server
 - [Redis](https://redis.io/) for high-performance caching and rate limiting
-- The Node.js and TypeScript communities for amazing tools and libraries
-- All contributors and testers who helped improve this project
+- The [Node.js](https://nodejs.org/en) and [TypeScript](https://www.typescriptlang.org/) communities for amazing tools and libraries
 
 ---
 
-## 📞 Support
+## Support
 
 If you have questions or need help:
 - Open an [Issue](https://github.com/lfariabr/excel-pilot/issues)
@@ -641,7 +617,6 @@ If you have questions or need help:
 
 ---
 
-**Built with ❤️ using Node.js, TypeScript, and OpenAI**
-
+> “Whether it’s concrete or code, structure is everything.”
 
 
