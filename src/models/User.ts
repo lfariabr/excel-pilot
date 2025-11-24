@@ -25,6 +25,9 @@ export interface User extends Document {
     // building: [];
     // lastLogin: Date;
 
+    createdAt: Date;
+    updatedAt: Date;
+
 }
 
 const userSchema = new Schema<User>({
