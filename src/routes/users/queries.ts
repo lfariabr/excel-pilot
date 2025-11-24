@@ -20,6 +20,8 @@ const router = Router();
  */
 router.get("/", requireAuth, async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // TODO: Minor note: The logging pattern at lines 23-27, 31-36, 64-69, 94-99 is repetitive.
+        // Consider extracting into a logging helper function if this pattern is used across multiple routes.
         logHTTP('REST GET /users - List all users', {
             method: req.method,
             path: req.path,

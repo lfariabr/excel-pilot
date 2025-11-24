@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt';
 import { AppError } from '../utils/errorHandler';
+import { JwtPayload } from '../utils/jwt';
 
 /**
  * Express middleware to verify JWT token and attach user to request
@@ -22,7 +23,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     }
     
     // Attach user to request
-    (req as any).user = payload;
+    (req as Request & { user?: JwtPayload }).user = payload;
     next();
   } catch (error) {
     if (error instanceof AppError) {
@@ -38,7 +39,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
  */
 export function requireRole(roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = (req as any).user;
+    const user = (req as Request & { user?: JwtPayload }).user;
     
     if (!user) {
       return next(new AppError(401, 'Unauthenticated'));

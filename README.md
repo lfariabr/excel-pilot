@@ -525,29 +525,48 @@ Time:        20.896 s
 
 ### 🚧 Upcoming Features
 
-#### v0.0.14 - AI Agent Enhancements
+#### v0.0.14 - REST API
+- Complete CRUD operations for all resources
+- Enhanced authentication and authorization
+- Improved error handling and validation
+- Better documentation and examples
+- Consistent response formatting
+- Input validation and sanitization
+- Rate limiting per endpoint
+- Comprehensive error responses
+- API versioning support
+- Pagination support
+- CORS configuration
+- Health check endpoint
+- Documentation with Swagger/OpenAPI
+- Request logging and monitoring
+- Rate limiting middleware
+- Request validation middleware
+
+#### v0.0.xx - AI Agent Enhancements
 - Natural language intent recognition
 - Enhanced context awareness
 - Conversation history optimization
 - Multi-turn conversation improvements
 
-#### v0.0.15 - Performance & Caching
+#### v0.0.xx - Performance & Caching
 - Redis-based query caching (24h TTL)
 - Conversation context caching
 - System prompt caching
 - Database query optimization and indexing
 
-#### v0.0.16 - Monitoring & Observability
+#### v0.0.xx - Monitoring & Observability
 - Prometheus metrics integration
 - Grafana dashboards
 - Health check endpoints
 - Performance monitoring
 
-#### v0.0.17 - CI/CD & Automation
+#### v0.0.xx - CI/CD & Automation
 - GitHub Actions pipeline
 - Automated testing on PR
 - Automated deployment
 - Code quality checks
+- Release management
 
 #### Future Considerations
 - API versioning
@@ -556,6 +575,10 @@ Time:        20.896 s
 - OpenAPI/Swagger documentation
 - Multi-language support
 - Advanced analytics and reporting
+- Backup and recovery procedures
+- Disaster recovery planning
+- Data migration strategies
+- Security audit procedures
 
 ---
 

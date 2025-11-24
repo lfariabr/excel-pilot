@@ -174,6 +174,9 @@ router.patch("/:id", requireAuth, async (req: Request, res: Response, next: Next
             });
             throw new AppError(404, "Not found");
         }
+
+        // Prevent direct password updates
+        const { password: _, ...userResponse } = doc;
         
         logHTTP('REST PATCH /users/:id - User updated successfully', {
             method: req.method,
@@ -183,7 +186,7 @@ router.patch("/:id", requireAuth, async (req: Request, res: Response, next: Next
             updateFields: Object.keys(updateData)
         });
         
-        res.json(doc);
+        res.json(userResponse);
     } catch (error) {
         if (!(error instanceof AppError)) {
             logError('REST PATCH /users/:id - Error', error as Error, {
