@@ -10,6 +10,7 @@ import { Request, Response, NextFunction } from "express";
 import { AppError } from "./utils/errorHandler";
 
 // REST routes
+import authRouter from "./routes/auth";
 import userRouter from "./routes/users";
 import rateLimiterLogsRouter from "./routes/rateLimiterLogs";
 
@@ -34,6 +35,7 @@ export function createApp() {
     });
   
     // REST routes
+    app.use("/auth", authRouter);
     app.use("/users", userRouter);
     app.use("/analytics", rateLimiterLogsRouter);
 
