@@ -1,14 +1,16 @@
 // app.ts — pure Express app (no listening)
 
-import express from "express";
+import "dotenv/config";
 import cors from "cors";
 import helmet from "helmet";
-import "dotenv/config";
-import { Request, Response, NextFunction } from "express";
-import { AppError } from "./utils/errorHandler";
+import express from "express";
 import mongoose from "mongoose";
 
-import userRouter from "./routes/user";
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "./utils/errorHandler";
+
+// REST routes
+import userRouter from "./routes/users";
 import rateLimiterLogsRouter from "./routes/rateLimiterLogs";
 
 
@@ -31,7 +33,7 @@ export function createApp() {
       res.status(up ? 200 : 503).json({ mongo: up });
     });
   
-    // REST
+    // REST routes
     app.use("/users", userRouter);
     app.use("/analytics", rateLimiterLogsRouter);
 

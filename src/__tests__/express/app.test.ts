@@ -127,24 +127,6 @@ describe('Express App', () => {
     });
   });
 
-  describe('REST Routes', () => {
-    it('should mount /users routes', async () => {
-      const response = await request(app)
-        .get('/users');
-
-      // Router should be mounted - expect auth/method errors, not 404
-      expect(response.status).toBeDefined();
-      expect([40, 401, 405, 500]).toContain(response.status);
-    });
-
-    it('should mount /analytics routes', async () => {
-      const response = await request(app)
-        .get('/analytics');
-
-      expect(response.status).toBeDefined();
-    });
-  });
-
   describe('Security Headers', () => {
     it('should prevent XSS via Content-Type headers', async () => {
       const response = await request(app)

@@ -4,7 +4,7 @@
 
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/typescript-5.9.2-blue)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-224%20passing-success)](https://jestjs.io/)
+[![Tests](https://img.shields.io/badge/tests-254%20passing-success)](https://jestjs.io/)
 [![Coverage](https://img.shields.io/badge/coverage-85%25-green)](#testing)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![CodeRabbit](https://img.shields.io/coderabbit/prs/github/lfariabr/excel-pilot)](https://coderabbit.ai)
@@ -40,7 +40,7 @@
 - 📈 **Analytics** - Track API usage, rate limit violations, and token consumption
 - 📝 **Structured Logging** - Winston-based logging with daily rotation (14/30/7 day retention)
 - 🐳 **Docker Support** - Multi-stage builds and Docker Compose orchestration
-- ✅ **Comprehensive Testing** - 224 tests covering unit, integration, and E2E scenarios
+- ✅ **Comprehensive Testing** - 254 tests covering unit, integration, and E2E scenarios
 - 🎯 **Dual API** - REST for simple operations, GraphQL for complex queries
 
 ---
@@ -440,7 +440,7 @@ Winston logs are stored in `logs/` directory:
 ## 🧪 Testing
 
 ### Test Coverage
-- **224 tests** across unit, integration, and E2E
+- **254 tests** across unit, integration, and E2E
 - **85%+ code coverage**
 - **MongoDB Memory Server** for isolated database testing
 - **Comprehensive mocking** for external dependencies (OpenAI, Redis)
@@ -495,8 +495,8 @@ npm test -- src/__tests__/auth/jwt.test.ts
 
 ### Test Output Example
 ```
-Test Suites: 19 passed, 19 total
-Tests:       224 passed, 224 total
+Test Suites: 21 passed, 21 total
+Tests:       254 passed, 254 total
 Snapshots:   0 total
 Time:        20.896 s
 ```
@@ -519,7 +519,7 @@ Time:        20.896 s
 | v0.0.8 | Redis | Rate limiting and token budget tracking |
 | v0.0.9 | OpenAI Core | Cursor pagination, auto titles/summaries |
 | v0.0.10 | Advanced Rate Limiting | Circuit breaker, analytics, health checks |
-| v0.0.11 | Jest Testing | 224 comprehensive tests |
+| v0.0.11 | Jest Testing | 254 comprehensive tests |
 | v0.0.12 | Docker | Containerization and orchestration |
 | v0.0.13 | Winston Logging | Production-grade structured logging |
 
